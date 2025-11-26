@@ -5531,7 +5531,7 @@ def add_section_header(cell, text):
 def add_main_section_header(cell, text):
     """Add a main section header with underline"""
     para = cell.add_paragraph()
-    run = para.add_run(text.upper())s
+    run = para.add_run(text.upper())
     run.font.size = Pt(12)
     run.font.bold = True
     run.font.color.rgb = RGBColor(0, 0, 0)
