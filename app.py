@@ -8078,7 +8078,7 @@ if __name__ == "__main__":
 
         # Get configuration from environment
         debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
-        host = os.environ.get('FLASK_HOST', '127.0.0.1')
+        host = os.environ.get('FLASK_HOST', '0.0.0.0')
         port = int(os.environ.get('FLASK_PORT', 5000))
 
         logger.info(f"Starting Flask app on {host}:{port} (debug={debug_mode})")
