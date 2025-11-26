@@ -1,0 +1,311 @@
+<!-- Applicant_Dashboard.html-->
+
+{% extends "base.html" %}
+{% block body_class %}white-page{% endblock %}
+{% block title %}Employee Dashboard{% endblock %}
+{% block Addnav %}
+<li class="nav-item active">
+  <a class="nav-links" role="menuitem" href="/HR1/show_job">Jobs</a>
+</li>
+{% endblock %} 
+
+{% block content %}
+<div class="container">
+
+
+      <!-- Enhanced AI Analysis Results Section -->
+      <div class="application-insights" style="display: none;" id="applicationInsights">
+        <div class="card mt-4">
+          <div class="card-header bg-info text-white">
+            <h5>🤖 AI Analysis Results</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Traditional Matching</h6>
+                <div class="progress mb-2">
+                  <div class="progress-bar" id="traditionalScore" role="progressbar" style="width: 0%"></div>
+                </div>
+                
+                <h6>Semantic Matching</h6>
+                <div class="progress mb-2">
+                  <div class="progress-bar bg-info" id="semanticScore" role="progressbar" style="width: 0%"></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <h6>Success Probability</h6>
+                <div class="progress mb-2">
+                  <div class="progress-bar bg-success" id="successScore" role="progressbar" style="width: 0%"></div>
+                </div>
+                
+                <h6>Hiring Likelihood</h6>
+                <div class="progress mb-2">
+                  <div class="progress-bar bg-warning" id="hiringScore" role="progressbar" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-3">
+              <h6>Your Strengths:</h6>
+              <div id="keyFactors" class="alert alert-success"></div>
+              
+              <h6>AI-Powered Suggestions:</h6>
+              <div id="suggestions" class="alert alert-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Error Messages -->
+      {% if errorMsg %}
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ errorMsg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+
+      {% if successMsg %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ successMsg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+// Load available jobs when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  loadAvailableJobs();
+  checkAISystemHealth();
+  
+  // Check AI system health every 5 minutes
+  setInterval(checkAISystemHealth, 5 * 60 * 1000);
+});
+
+function loadAvailableJobs() {
+  fetch('/HR1/show_job')
+    .then(response => response.text())
+    .then(html => {
+      // Parse the HTML to extract job data
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      
+      // Extract job information (you may need to adjust this based on your show_job template)
+      displayJobs();
+    })
+    .catch(error => {
+      console.error('Error loading jobs:', error);
+      document.getElementById('jobsContainer').innerHTML = '<p class="text-danger">Error loading jobs. Please refresh the page.</p>';
+    });
+}
+
+function displayJobs() {
+  // For now, let's create a simple way to get jobs
+  // You can modify this to match your actual job data structure
+  const jobsContainer = document.getElementById('jobsContainer');
+  
+  jobsContainer.innerHTML = `
+    <div class="row">
+      <div class="col-12">
+        <p>To apply for jobs with AI analysis, please:</p>
+        <ol>
+          <li>Make sure you have uploaded a resume above</li>
+          <li>Visit the <a href="/HR1/show_job" class="btn btn-sm btn-outline-primary">Jobs Page</a> to see all available positions</li>
+          <li>Use the enhanced application feature for AI-powered matching</li>
+        </ol>
+        
+        <div class="mt-3">
+          <button class="btn btn-info" onclick="testAIFeatures()">Test AI Features</button>
+          <a href="/HR1/show_job" class="btn btn-primary">View All Jobs</a>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+
+
+
+// Enhanced application submission
+function applyJobEnhanced(jobId, resumeId) {
+  if (!jobId || !resumeId) {
+    showNotification('Please select both a job and resume to apply.', 'error');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('job_id', jobId);
+  formData.append('resume_id', resumeId);
+  
+  // Show loading indicator
+  showLoadingIndicator('Analyzing your profile with AI...');
+  
+  fetch('/apply_job', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    hideLoadingIndicator();
+    
+    if (data.StatusCode === 200) {
+      // Show enhanced results
+      displayApplicationResults(data);
+      
+      // Show success message with AI features
+      showNotification(
+        `Application submitted successfully! AI analysis complete in ${data.ProcessingTime}`,
+        'success'
+      );
+    } else {
+      showNotification(data.Message || 'Application failed', 'error');
+    }
+  })
+  .catch(error => {
+    hideLoadingIndicator();
+    console.error('Error:', error);
+    showNotification('Application processing failed', 'error');
+  });
+}
+
+function displayApplicationResults(data) {
+  // Show the insights section
+  document.getElementById('applicationInsights').style.display = 'block';
+  
+  // Update progress bars
+  updateProgressBar('traditionalScore', data.TraditionalScore, `${data.TraditionalScore}%`);
+  updateProgressBar('semanticScore', data.SemanticScore, `${data.SemanticScore}%`);
+  updateProgressBar('successScore', data.SuccessProbability, `${data.SuccessProbability}%`);
+  updateProgressBar('hiringScore', data.HiringLikelihood, `${data.HiringLikelihood}%`);
+  
+  // Update key factors
+  const keyFactorsDiv = document.getElementById('keyFactors');
+  if (data.KeyFactors && data.KeyFactors.length > 0) {
+    keyFactorsDiv.innerHTML = '<ul>' + data.KeyFactors.map(factor => `<li>${factor}</li>`).join('') + '</ul>';
+  } else {
+    keyFactorsDiv.innerHTML = 'Your profile shows good overall alignment with the job requirements.';
+  }
+  
+  // Show AI features used
+  const suggestionsDiv = document.getElementById('suggestions');
+  suggestionsDiv.innerHTML = `
+    <p><strong>AI Features Used:</strong> ${data.AIFeatures?.join(', ') || 'Advanced matching algorithms'}</p>
+    
+    <p><strong>Processing Time:</strong> ${data.ProcessingTime}</p>
+  `;
+  
+  // Scroll to results
+  document.getElementById('applicationInsights').scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateProgressBar(elementId, value, text) {
+  const progressBar = document.getElementById(elementId);
+  progressBar.style.width = `${Math.min(100, Math.max(0, value))}%`;
+  progressBar.textContent = text;
+  progressBar.setAttribute('aria-valuenow', value);
+}
+
+function showLoadingIndicator(message) {
+  // Create loading overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'loadingOverlay';
+  overlay.innerHTML = `
+    <div class="d-flex justify-content-center align-items-center h-100" style="background: rgba(0,0,0,0.7); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
+      <div class="text-center text-white">
+        <div class="spinner-border mb-3" role="status"></div>
+        <div>${message}</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function hideLoadingIndicator() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function showNotification(message, type) {
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+  const notification = `
+    <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+  
+  // Add to top of page
+  document.body.insertAdjacentHTML('afterbegin', notification);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => {
+    const alert = document.querySelector('.alert');
+    if (alert) {
+      alert.remove();
+    }
+  }, 5000);
+}
+
+function checkAISystemHealth() {
+  fetch('/system_health_ai')
+    .then(response => response.json())
+    .then(data => {
+      const statusBadge = document.getElementById('ai-status-badge');
+      if (statusBadge) {
+        if (data.status === 'available') {
+          statusBadge.className = 'badge bg-success';
+          statusBadge.textContent = '🤖 AI Ready';
+        } else {
+          statusBadge.className = 'badge bg-warning';
+          statusBadge.textContent = '⚠️ AI Limited';
+        }
+      }
+    })
+    .catch(error => {
+      console.error('AI health check failed:', error);
+      const statusBadge = document.getElementById('ai-status-badge');
+      if (statusBadge) {
+        statusBadge.className = 'badge bg-danger';
+        statusBadge.textContent = '❌ AI Offline';
+      }
+    });
+}
+
+// Global function for applying to jobs (called from job listings)
+window.applyToJob = function(jobId, resumeId) {
+  applyJobEnhanced(jobId, resumeId);
+};
+</script>
+
+<style>
+.ai-status-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.progress {
+  height: 25px;
+}
+
+.progress-bar {
+  font-size: 14px;
+  line-height: 25px;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+</style>
+{% endblock %}

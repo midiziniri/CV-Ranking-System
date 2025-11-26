@@ -1,0 +1,1147 @@
+<!--applicant_dashboard_enhanced.html-->
+{% extends "base.html" %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block Addnav %}
+<!--<li class="nav-item active">
+  <a class="nav-links" role="menuitem" href="/Applicant_Dashboard_Enhanced">Dashboard</a>
+</li>-->
+{% endblock %}
+
+{% block content %}
+<style>
+.completion-fill {
+  background-color: #8b5cf6;
+  width: var(--progress);
+  height: 8px;
+  border-radius: 6px;
+}
+
+.applicant-dashboard {
+  padding: 2rem;
+   background: #fafafa;
+  border-top: 4px solid #8bb7ff; 
+  min-height: 100vh;
+}
+
+.dashboard-header {
+background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05)
+}
+
+.profile-completion {
+  background: linear-gradient(135deg, #10b981, #047857);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: white;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-completion::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  transform: translate(30px, -30px);
+}
+
+.completion-bar {
+  width: 100%;
+  height: 0.75rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.375rem;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.completion-fill {
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 0.375rem;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.completion-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-icon {
+  font-size: 2rem;
+  opacity: 0.7;
+}
+
+.application-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.application-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  border-left-color: #3b82f6;
+}
+
+.application-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.company-info h4 {
+  margin-bottom: 0.25rem;
+  color: #1f2937;
+}
+
+.company-name {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-under_review { background: #dbeafe; color: #1e40af; }
+.status-shortlisted { background: #dcfce7; color: #166534; }
+.status-interviewed { background: #ede9fe; color: #6b21a8; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.scores-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.score-item {
+  text-align: center;
+}
+
+.score-circle {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin: 0 auto 0.5rem;
+}
+
+.score-high { background: #dcfce7; color: #166534; }
+.score-medium { background: #fef3c7; color: #92400e; }
+.score-low { background: #fee2e2; color: #991b1b; }
+
+.score-label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.ai-feedback {
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-top: 1rem;
+}
+
+.ai-feedback-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0369a1;
+  margin-bottom: 0.25rem;
+}
+
+.ai-feedback-text {
+  font-size: 0.875rem;
+  color: #0c4a6e;
+}
+
+.ai-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0.125rem;
+}
+
+.ai-badge.success { background: #dcfce7; color: #166534; }
+.ai-badge.info { background: #dbeafe; color: #1e40af; }
+.ai-badge.warning { background: #fef3c7; color: #92400e; }
+.ai-badge.primary { background: #e0f2fe; color: #0369a1; }
+
+.ai-insights-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.insight-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.insight-icon {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+  border-color: #3b82f6;
+  text-decoration: none;
+  color: inherit;
+}
+
+.action-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.content-section {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.interview-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  border-left: 4px solid #3b82f6;
+  background: #f8fafc;
+}
+
+.interview-info {
+  flex: 1;
+}
+
+.interview-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.interview-company {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.interview-time {
+  color: #3b82f6;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.job-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.job-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.1);
+}
+
+.job-card.hot-job::before {
+  content: '🔥 Hot';
+  position: absolute;
+  top: -8px;
+  right: 1rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.job-card.new-job::before {
+  content: '✨ New';
+  position: absolute;
+  top: -8px;
+  right: 1rem;
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.job-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.job-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.job-company {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.job-match {
+  text-align: right;
+}
+
+.match-score {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 0.25rem;
+}
+
+.job-description {
+  color: #4b5563;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.job-skills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.skill-tag {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.apply-btn {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.apply-btn:hover {
+  background: #2563eb;
+  color: white;
+  text-decoration: none;
+}
+
+.resume-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.resume-item:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.resume-info {
+  flex: 1;
+}
+
+.resume-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.resume-meta {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.resume-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+  background: transparent;
+}
+
+.btn-outline-danger {
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  background: transparent;
+}
+
+.ai-insights-panel {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.insight-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.insight-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.insight-description {
+  opacity: 0.9;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.insight-action {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.insight-action:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+  text-decoration: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+  .applicant-dashboard {
+    padding: 1rem;
+  }
+  
+  .stats-grid, .quick-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-header {
+    padding: 1.5rem;
+  }
+  
+  .scores-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>
+
+<div class="applicant-dashboard">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-4">
+      <div>
+        <h1 class="h2 mb-2">Welcome back, {{ session.user_name }}!</h1>
+        <p class="mb-0 opacity-90">Track your applications and discover new opportunities</p>
+      </div>
+      <div class="text-end">
+        <div class="small opacity-75">{{ current_date.strftime('%B %d, %Y') if current_date else '' }}</div>
+        <div class="h4 mb-0">{{ current_time.strftime('%I:%M %p') if current_time else '' }}</div>
+      </div>
+    </div>
+  </div>
+
+   <!-- Profile Completion
+  <div class="profile-completion">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+      <h3 class="h5 mb-0">Profile Completion</h3>
+      <span class="h4 mb-0 fw-bold">{{ profile_completion or 0 }}%</span>
+    </div>
+    <div class="completion-bar" style="--progress: {{ profile_completion }}%;">
+  <div class="completion-fill"></div>
+</div>
+    </div>
+    <p class="mb-2 opacity-80">
+      {% if profile_completion < 100 %}
+        Complete your profile to get better job matches and increase your visibility to employers.
+      {% else %}
+        Your profile is complete! You're ready to apply for jobs.
+      {% endif %}
+    </p>
+    {% if missing_fields and missing_fields|length > 0 %}
+    <div class="small mb-4 opacity-80">
+      <strong>Missing:</strong> {{ missing_fields|join(', ') }}
+    </div>
+    {% endif %} -->
+  
+
+  <!-- Key Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-number">{{ user_stats.total_applications or 0 }}</div>
+          <div class="text-muted fw-medium">Applications Submitted</div>
+        </div>
+        <div class="stat-icon">📄</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-number">{{ user_stats.interviews_scheduled or 0 }}</div>
+          <div class="text-muted fw-medium">Interviews Scheduled</div>
+        </div>
+        <div class="stat-icon">📅</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-number">{{ user_stats.avg_match_score or 0 }}%</div>
+          <div class="text-muted fw-medium">Avg Match Score</div>
+        </div>
+        <div class="stat-icon">🎯</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div>
+          <div class="stat-number">{{ user_stats.applications_shortlisted or 0 }}</div>
+          <div class="text-muted fw-medium">Shortlisted</div>
+        </div>
+        <div class="stat-icon">⭐</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Insights Panel - Fixed condition 
+  {% if ai_insights and ai_insights|length > 0 %}
+  <div class="ai-insights-panel">
+    <h3 class="h5 mb-4">🧠 Personalized AI Insights</h3>
+    <div class="row">
+      {% for insight in ai_insights %}
+        <div class="col-md-6 mb-3">
+          <div class="insight-item">
+            <div class="insight-title">{{ insight.title }}</div>
+            <div class="insight-description">{{ insight.description }}</div>
+            {% if insight.action %}
+              <a href="{{ insight.action_url }}" class="insight-action">{{ insight.action }}</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}-->
+
+  <!-- Predictive Insights Panel -->
+  <div class="ai-insights-panel" id="dynamic-insights" style="display: none;">
+    <h3 class="h5 mb-4">🧠 Predictive Insights</h3>
+    <div id="insights-content"></div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a href="/HR1/show_job" class="action-card">
+      <div class="action-icon">🔍</div>
+      <h5 class="fw-semibold mb-2">Browse Jobs</h5>
+      <p class="small text-muted mb-0">Find new opportunities</p>
+    </a>
+
+    <a href="/applicant_upload_resume" class="action-card">
+      <div class="action-icon">📄</div>
+      <h5 class="fw-semibold mb-2">Upload Resume</h5>
+      <p class="small text-muted mb-0">Update your profile</p>
+    </a>
+
+    <a href="/my_applications" class="action-card">
+      <div class="action-icon">📋</div>
+      <h5 class="fw-semibold mb-2">My Applications</h5>
+      <p class="small text-muted mb-0">Track your progress</p>
+    </a>
+
+    <a href="/interviews" class="action-card">
+      <div class="action-icon">📅</div>
+      <h5 class="fw-semibold mb-2">Interviews</h5>
+      <p class="small text-muted mb-0">Manage your schedule</p>
+    </a>
+  </div>
+
+  <div class="row">
+    <!-- Recent Applications -->
+    <div class="col-lg-6 mb-4">
+      <div class="content-section">
+        <div class="section-header">
+          <h5 class="mb-0">Recent Applications</h5>
+         <!-- <a href="/my_applications" class="text-primary text-decoration-none small fw-medium">View All</a>-->
+        </div>
+        
+        {% if recent_applications and recent_applications|length > 0 %}
+  {% for application in recent_applications %}
+  <div class="application-card">
+    <div class="application-header">
+      <div class="company-info">
+        <h4 class="h6 mb-1">{{ application.job_title }}</h4>
+        <div class="company-name">{{ application.company_name or 'Company' }}</div>
+      </div>
+      <span class="status-badge status-{{ application.status }}">
+        {{ application.status|replace('_', ' ')|title }}
+      </span>
+    </div>
+    
+    <div class="scores-section">
+      <div class="score-item">
+        <div class="score-circle 
+          {% if application.match_score >= 80 %} score-high
+          {% elif application.match_score >= 60 %} score-medium
+          {% else %} score-low
+          {% endif %}">
+          {{ application.match_score or 0 }}%
+        </div>
+        <div class="score-label">Match</div>
+      </div>
+    </div>
+    
+    <div class="d-flex justify-content-between align-items-center">
+      <div class="small text-muted">
+        Applied {{ application.applied_date.strftime('%b %d') if application.applied_date else 'Recently' }}
+      </div>
+      {% if application.ai_enhanced %}
+      <span class="badge bg-primary">AI Enhanced</span>
+      {% endif %}
+    </div>
+    
+    <!-- AI Badges Section - MOVE THIS INSIDE THE LOOP -->
+    {% if application.ai_badges %}
+    <div class="ai-badges mt-2">
+      {% for badge in application.ai_badges %}
+        <span class="ai-badge {{ badge.color }}">
+          <span class="insight-icon">
+            {% if badge.icon == 'brain' %}🧠
+            {% elif badge.icon == 'shield-check' %}✅
+            {% elif badge.icon == 'cpu' %}⚡
+            {% elif badge.icon == 'star' %}⭐
+            {% else %}🔍
+            {% endif %}
+          </span>
+          {{ badge.message }}
+        </span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- AI Insight Section -->
+    {% if application.ai_insight %}
+    <div class="ai-feedback">
+      <div class="ai-feedback-title">AI Insight:</div>
+      <div class="ai-feedback-text">{{ application.ai_insight }}</div>
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">📄</div>
+            <p class="mb-2">No applications yet</p>
+            <a href="/HR1/show_job" class="text-primary text-decoration-none">Browse jobs to get started</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Upcoming Interviews & Job Recommendations -->
+    <div class="col-lg-6 mb-4">
+      <!-- Upcoming Interviews -->
+      <div class="content-section mb-4">
+        <div class="section-header">
+          <h5 class="mb-0">Upcoming Interviews</h5>
+        </div>
+        
+        {% if upcoming_interviews and upcoming_interviews|length > 0 %}
+          {% for interview in upcoming_interviews %}
+          <div class="interview-item">
+            <div class="interview-info">
+              <div class="interview-title">{{ interview.job_title }}</div>
+              <div class="interview-company">{{ interview.company_name }}</div>
+              <div class="interview-time">
+                {{ interview.interview_date.strftime('%B %d, %Y at %I:%M %p') if interview.interview_date else 'Date TBD' }}
+              </div>
+            </div>
+            <div class="text-end">
+              <div class="small text-primary fw-medium">{{ interview.interview_type or 'Interview' }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">📅</div>
+            <p class="mb-0 small">No interviews scheduled</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Job Recommendations -->
+      <div class="content-section">
+        <div class="section-header">
+          <h5 class="mb-0">Recommended Jobs</h5>
+          <a href="/HR1/show_job" class="text-primary text-decoration-none small fw-medium">View All</a>
+        </div>
+        
+        {% if recommended_jobs and recommended_jobs|length > 0 %}
+          {% for job in recommended_jobs %}
+          <div class="job-card {% if job.match_score > 85 %}hot-job{% elif job.posted_date and (current_date - job.posted_date).days < 7 %}new-job{% endif %}">
+            <div class="job-header">
+              <div class="job-info">
+                <div class="job-title">{{ job.title }}</div>
+                <div class="job-company">{{ job.company or 'Company' }}</div>
+              </div>
+              <div class="job-match">
+                <div class="match-score">{{ job.match_score or 0 }}%</div>
+                {% if job.salary_range %}
+                <div class="small text-muted">{{ job.salary_range }}</div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="job-description">{{ job.description[:100] }}...</div>
+            
+            <div class="job-footer">
+              <div class="job-skills">
+                {% for skill in job.key_skills[:3] %}
+                <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+              </div>
+              <a href="/HR1/show_job" class="apply-btn">View Details</a>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <p class="mb-2 small">No recommendations yet</p>
+            <p class="mb-0 small text-muted">Complete your profile to get personalized job matches</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Resume Management 
+  <div class="content-section">
+    <div class="section-header">
+      <h5 class="mb-0">My Resumes</h5>
+      <a href="/applicant_upload_resume" class="btn btn-primary btn-sm">Upload New Resume</a>
+    </div>
+    
+    {% if user_resumes and user_resumes|length > 0 %}
+      {% for resume in user_resumes %}
+      <div class="resume-item">
+        <div class="resume-info">
+          <div class="resume-title">{{ resume.ResumeTitle or 'Untitled Resume' }}</div>
+          <div class="resume-meta">
+            Uploaded {{ resume.UploadedAt.strftime('%b %d, %Y') if resume.UploadedAt else 'Recently' }}
+            {% if resume.SKILLS %}
+            | {{ resume.SKILLS|length }} skills detected
+            {% endif %}
+            {% if resume.application_count %}
+            | Used in {{ resume.application_count }} applications
+            {% endif %}
+          </div>
+        </div>
+        <div class="resume-actions">
+          <button onclick="viewResume('{{ resume._id }}')" class="btn-sm btn-outline-primary">
+            View
+          </button>
+          <button onclick="deleteResume('{{ resume._id }}')" class="btn-sm btn-outline-danger">
+            Delete
+          </button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <p class="mb-2">No resumes uploaded yet</p>
+        <a href="/applicant_upload_resume" class="text-primary text-decoration-none">Upload your first resume</a>
+      </div>-->
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// Update time every minute
+function updateTime() {
+  const now = new Date();
+  const timeElements = document.querySelectorAll('.dashboard-header .h4');
+  if (timeElements.length > 0) {
+    timeElements[0].textContent = now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+}
+
+setInterval(updateTime, 60000);
+
+// Resume management functions
+function viewResume(resumeId) {
+  window.open(`/view_resume/${resumeId}`, '_blank');
+}
+
+function deleteResume(resumeId) {
+  if (confirm('Are you sure you want to delete this resume?')) {
+    fetch(`/deleteResume/${resumeId}`, {
+      method: 'POST',
+    })
+    .then(response => {
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert('Error deleting resume');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error deleting resume');
+    });
+  }
+}
+
+// Real-time dashboard updates
+function updateDashboardStats() {
+  fetch('/api/dashboard_stats_applicant')
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) return;
+      
+      // Update stat numbers
+      const statNumbers = document.querySelectorAll('.stat-number');
+      if (statNumbers[0]) statNumbers[0].textContent = data.total_applications || 0;
+      if (statNumbers[1]) statNumbers[1].textContent = data.interviews_scheduled || 0;
+      if (statNumbers[2]) statNumbers[2].textContent = (data.avg_match_score || 0) + '%';
+      if (statNumbers[3]) statNumbers[3].textContent = data.applications_shortlisted || 0;
+    })
+    .catch(error => console.log('Stats update failed:', error));
+}
+
+// Update every 5 minutes
+setInterval(updateDashboardStats, 5 * 60 * 1000);
+
+// Add interactivity to cards
+document.querySelectorAll('.stat-card, .action-card, .application-card').forEach(card => {
+  card.addEventListener('click', function() {
+    this.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      this.style.transform = '';
+    }, 150);
+  });
+});
+
+// Animate completion bar on load
+document.addEventListener('DOMContentLoaded', function() {
+  const completionFill = document.querySelector('.completion-fill');
+  if (completionFill) {
+    const targetWidth = completionFill.style.width;
+    completionFill.style.width = '0%';
+    setTimeout(() => {
+      completionFill.style.width = targetWidth;
+    }, 500);
+  }
+  
+  // Load predictive insights
+  loadPredictiveInsights();
+});
+
+// Job application with AI analysis
+function applyToJobWithAI(jobId, resumeId) {
+  if (!jobId || !resumeId) {
+    showNotification('Please select both a job and resume to apply.', 'error');
+    return;
+  }
+  
+  const formData = new FormData();
+  formData.append('job_id', jobId);
+  formData.append('resume_id', resumeId);
+  
+  showLoadingIndicator('Analyzing your profile with AI...');
+  
+  fetch('/apply_job', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    hideLoadingIndicator();
+    
+    if (data.StatusCode === 200) {
+      showNotification(
+        `Application submitted successfully! Match Score: ${data.TraditionalScore}%`,
+        'success'
+      );
+      setTimeout(() => location.reload(), 2000);
+    } else {
+      showNotification(data.Message || 'Application failed', 'error');
+    }
+  })
+  .catch(error => {
+    hideLoadingIndicator();
+    console.error('Error:', error);
+    showNotification('Application processing failed', 'error');
+  });
+}
+
+function showLoadingIndicator(message) {
+  const overlay = document.createElement('div');
+  overlay.id = 'loadingOverlay';
+  overlay.innerHTML = `
+    <div style="background: rgba(0,0,0,0.7); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;">
+      <div class="text-center text-white">
+        <div class="spinner-border mb-3" role="status"></div>
+        <div>${message}</div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function hideLoadingIndicator() {
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function showNotification(message, type) {
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+  const notification = `
+    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('afterbegin', notification);
+  
+  setTimeout(() => {
+    const alert = document.querySelector('.alert');
+    if (alert) {
+      alert.remove();
+    }
+  }, 5000);
+}
+
+// Load predictive insights
+function loadPredictiveInsights() {
+ f .then(response => response.json())
+    .then(data => {
+        let html = `<p><strong>Analysis:</strong> ${data.insight}</p>`;
+        
+        if (data.predictions && data.predictions.length > 0) {
+            html += '<h6>Predictions:</h6>';
+            data.predictions.forEach(pred => {
+                html += `
+                    <div class="prediction-item mb-2 p-2 border-left-primary">
+                        <strong>${pred.prediction}</strong><br>
+                        <small class="text-muted">Confidence: ${pred.confidence} | ${pred.timeframe}</small>
+                    </div>
+                `;
+            });
+        }
+        
+        if (data.next_steps && data.next_steps.length > 0) {
+            html += '<h6>Next Steps:</h6><ul>';
+            data.next_steps.forEach(step => {
+                html += `<li>${step}</li>`;
+            });
+            html += '</ul>';
+        }
+        
+        // Show the dynamic insights section
+        document.getElementById('insights-content').innerHTML = html;
+        document.getElementById('dynamic-insights').style.display = 'block';
+    })
+    .catch(error => {
+        console.error('Error loading insights:', error);
+    });}
+
+// Make functions globally available
+window.applyToJobWithAI = applyToJobWithAI;
+window.viewResume = viewResume;
+window.deleteResume = deleteResume;
+</script>
+
+{% endblock %}

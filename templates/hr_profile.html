@@ -1,0 +1,838 @@
+{% extends "base.html" %}
+{% block title %}HR Profile & Company Settings{% endblock %}
+
+{% block content %}
+<style>
+
+    .activity-icon {
+    background-color: var(--activity-color);
+}
+
+.container-fluid {
+    padding: 2rem;
+    background: #fafafa;
+    margin: 0;
+    min-height: 100vh;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #10b981;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+}
+
+.content-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 0.5rem;
+    transition: width 0.3s ease;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.stat-change {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.stat-increase { color: #10b981; }
+.stat-decrease { color: #ef4444; }
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    color: #ffffff;
+    border-bottom-color: #3b82f6;
+}
+
+.tab:hover {
+    color: #bfd8ff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.3s ease;
+}
+
+.activity-item:hover {
+    background: #f9fafb;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.25rem;
+}
+
+.activity-description {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.activity-time {
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+.job-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.job-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.job-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+}
+
+.job-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.job-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-open { background: #dcfce7; color: #166534; }
+.status-closed { background: #fee2e2; color: #991b1b; }
+.status-draft { background: #fef3c7; color: #92400e; }
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .profile-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .content-section {
+        padding: 1.5rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        min-width: 120px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: start;
+        gap: 1rem;
+    }
+
+    .job-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="position-relative">
+                    <img src="{{ user_profile.ProfilePicture or '/static/images/default-avatar.jpg' }}" 
+                         alt="Profile Picture" 
+                         class="profile-avatar"
+                         id="profileImage"
+                         onerror="this.src='/static/images/default-avatar.png'">
+                    <label for="profilePictureInput" class="profile-upload-btn" title="Change Profile Picture">
+                        <i class="bi bi-camera"></i>
+                    </label>
+                    <input type="file" 
+                           id="profilePictureInput" 
+                           accept="image/*" 
+                           style="display: none;"
+                           onchange="uploadProfilePicture(this)">
+                </div>
+            </div>
+            <div class="col">
+                <h2 class="mb-2">{{ user_profile.Name or session['user_name'] or 'Your Name' }}</h2>
+                <p class="mb-1 opacity-90">{{ user_profile.JobTitle or 'Add your job title' }} at {{ user_profile.CompanyName or 'Company' }}</p>
+                <p class="mb-0 opacity-75">
+                   <!-- <i class="bi bi-building me-1"></i>
+                    {{ user_profile.Industry or 'Add your industry' }} • {{ user_profile.CompanySize or 'Company size' }}-->
+                </p>
+            </div>
+            <!-- <div class="col-auto">
+                <div class="text-end">
+                    <div class="h4 mb-1">{{ profile_completion or 0 }}%</div>
+                    <div class="small opacity-75">Profile Complete</div>
+                    <div class="progress-bar">
+  <div class="completion-bar" style="--progress: {{ profile_completion }}%;">                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Status Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Quick Stats -->
+    <div class="stats-grid mt-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ hr_stats.total_jobs or 0 }}</div>
+            <div class="stat-label">Total Job Postings</div>
+            {% if hr_stats.jobs_change %}
+            <div class="stat-change {{ 'stat-increase' if hr_stats.jobs_change > 0 else 'stat-decrease' }}">
+                {{ '+' if hr_stats.jobs_change > 0 else '' }}{{ hr_stats.jobs_change }} this month
+            </div>
+            {% endif %}
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ hr_stats.total_applications or 0 }}</div>
+            <div class="stat-label">Total Applications</div>
+            {% if hr_stats.applications_change %}
+            <div class="stat-change {{ 'stat-increase' if hr_stats.applications_change > 0 else 'stat-decrease' }}">
+                {{ '+' if hr_stats.applications_change > 0 else '' }}{{ hr_stats.applications_change }} this week
+            </div>
+            {% endif %}
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ hr_stats.interviews_scheduled or 0 }}</div>
+            <div class="stat-label">Interviews Scheduled</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ hr_stats.candidates_hired or 0 }}</div>
+            <div class="stat-label">Candidates Hired</div>
+        </div>
+    </div>
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('profile')">
+            <i class="bi bi-person-circle me-2"></i>Profile Information
+        </div>
+        <div class="tab" onclick="switchTab('company')">
+            <i class="bi bi-building me-2"></i>Company Details
+        </div>
+        <div class="tab" onclick="switchTab('jobs')">
+            <i class="bi bi-briefcase me-2"></i>Job Postings
+        </div>
+        <div class="tab" onclick="switchTab('activity')">
+            <i class="bi bi-activity me-2"></i>Recent Activity
+        </div>
+    </div>
+
+    <!-- Profile Information Tab -->
+    <div id="profile-tab" class="tab-content active">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Personal Information</h5>
+                <button class="btn-primary" onclick="toggleEditMode()" id="editModeBtn">
+                    <i class="bi bi-pencil me-2"></i>
+                    <span id="editBtnText">Edit Profile</span>
+                </button>
+            </div>
+
+            <form id="profileForm" method="POST" action="/update_hr_profile">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" 
+                                   value="{{ user_profile.Name or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Work Email</label>
+                            <input type="email" name="email" class="form-control" 
+                                   value="{{ user_profile.Email or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone_number" class="form-control" 
+                                   value="{{ user_profile.PhoneNumber or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Job Title</label>
+                            <input type="text" name="job_title" class="form-control" 
+                                   value="{{ user_profile.JobTitle or '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" name="department" class="form-control" 
+                                   value="{{ user_profile.Department or '' }}" readonly>
+                        </div>
+                        <!--<div class="form-group">
+                            <label class="form-label">Years of Experience in HR</label>
+                            <select name="hr_experience" class="form-control" disabled>
+                                <option value="">Select Experience</option>
+                                <option value="1-2" {{ 'selected' if user_profile.HRExperience == '1-2' }}>1-2 years</option>
+                                <option value="3-5" {{ 'selected' if user_profile.HRExperience == '3-5' }}>3-5 years</option>
+                                <option value="6-10" {{ 'selected' if user_profile.HRExperience == '6-10' }}>6-10 years</option>
+                                <option value="10+" {{ 'selected' if user_profile.HRExperience == '10+' }}>10+ years</option>
+                            </select>
+                        </div>-->
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn Profile</label>
+                            <input type="url" name="linkedin_profile" class="form-control" 
+                                   value="{{ user_profile.LinkedInProfile or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" 
+                                   value="{{ user_profile.Location or '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="saveButtons" style="display: none;">
+                    <button type="submit" class="btn-primary me-2">
+                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="cancelEdit()">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Company Details Tab -->
+    <div id="company-tab" class="tab-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Company Information</h5>
+                <button class="btn-primary" onclick="toggleCompanyEditMode()" id="companyEditModeBtn">
+                    <i class="bi bi-pencil me-2"></i>
+                    <span id="companyEditBtnText">Edit Company Details</span>
+                </button>
+            </div>
+
+            <form id="companyForm" method="POST" action="/update_company_profile">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" name="company_name" class="form-control" 
+                                   value="{{ user_profile.CompanyName or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Industry</label>
+                            <input type="text" name="industry" class="form-control" 
+                                   value="{{ user_profile.Industry or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Size</label>
+                            <select name="company_size" class="form-control" disabled>
+                                <option value="">Select Size</option>
+                                <option value="1-10" {{ 'selected' if user_profile.CompanySize == '1-10' }}>1-10 employees</option>
+                                <option value="11-50" {{ 'selected' if user_profile.CompanySize == '11-50' }}>11-50 employees</option>
+                                <option value="51-200" {{ 'selected' if user_profile.CompanySize == '51-200' }}>51-200 employees</option>
+                                <option value="201-500" {{ 'selected' if user_profile.CompanySize == '201-500' }}>201-500 employees</option>
+                                <option value="501-1000" {{ 'selected' if user_profile.CompanySize == '501-1000' }}>501-1000 employees</option>
+                                <option value="1000+" {{ 'selected' if user_profile.CompanySize == '1000+' }}>1000+ employees</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Company Website</label>
+                            <input type="url" name="company_website" class="form-control" 
+                                   value="{{ user_profile.CompanyWebsite or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hiring Volume (per year)</label>
+                            <select name="hiring_volume" class="form-control" disabled>
+                                <option value="">Select Volume</option>
+                                <option value="1-5" {{ 'selected' if user_profile.HiringVolume == '1-5' }}>1-5 hires</option>
+                                <option value="6-15" {{ 'selected' if user_profile.HiringVolume == '6-15' }}>6-15 hires</option>
+                                <option value="16-50" {{ 'selected' if user_profile.HiringVolume == '16-50' }}>16-50 hires</option>
+                                <option value="50+" {{ 'selected' if user_profile.HiringVolume == '50+' }}>50+ hires</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Company Address</label>
+                            <textarea name="company_address" class="form-control" rows="3" readonly>{{ user_profile.CompanyAddress or '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Company Description</label>
+                    <textarea name="company_description" class="form-control" rows="4" readonly>{{ user_profile.CompanyDescription or '' }}</textarea>
+                </div>
+
+                <div id="companySaveButtons" style="display: none;">
+                    <button type="submit" class="btn-primary me-2">
+                        <i class="bi bi-check-circle me-2"></i>Save Company Details
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="cancelCompanyEdit()">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Postings Tab -->
+    <div id="jobs-tab" class="tab-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Your Job Postings</h5>
+                <a href="/HR1/Company_Job_Posting" class="btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Create New Job
+                </a>
+            </div>
+
+            {% if hr_jobs %}
+                {% for job in hr_jobs %}
+                <div class="job-card">
+                    <div class="job-title">{{ job.Job_Profile or 'Untitled Job' }}</div>
+                    <div class="job-meta">
+                        <span><i class="bi bi-calendar me-1"></i>Posted {{ job.CreatedAt.strftime('%b %d, %Y') if job.CreatedAt else 'Recently' }}</span>
+                        <span><i class="bi bi-people me-1"></i>{{ job.application_count or 0 }} applications</span>
+                        {% if job.LastDate %}
+                        <span><i class="bi bi-clock me-1"></i>Deadline {{ job.LastDate.strftime('%b %d, %Y') if job.LastDate else 'Not set' }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="job-status status-{{ job.Status.lower() if job.Status else 'draft' }}">
+                            {{ job.Status or 'Draft' }}
+                        </span>
+                        <div>
+                            <a href="/HR1/show_job" class="btn-secondary me-2">View Applications</a>
+                            <a href="/HR1/Company_Job_Posting" class="btn-secondary">Edit</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">💼</div>
+                    <h6>No job postings yet</h6>
+                    <p>Create your first job posting to start receiving applications from qualified candidates.</p>
+                    <a href="/HR1/Company_Job_Posting" class="btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Create First Job Posting
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recent Activity Tab -->
+    <div id="activity-tab" class="tab-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Recent Activity</h5>
+            </div>
+
+            {% if recent_activities %}
+                <ul class="activity-list">
+                    {% for activity in recent_activities %}
+                    <li class="activity-item">
+                       <div class="activity-icon" style="--activity-color: {{ activity.color }};">
+    {{ activity.icon }}
+</div>
+
+                        <div class="activity-content">
+                            <div class="activity-title">{{ activity.title }}</div>
+                            <div class="activity-description">{{ activity.description }}</div>
+                        </div>
+                        <div class="activity-time">{{ activity.time_ago }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📊</div>
+                    <h6>No recent activity</h6>
+                    <p>Activity will appear here as candidates apply to your job postings.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+let isEditMode = false;
+let isCompanyEditMode = false;
+
+function switchTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabName + '-tab').classList.add('active');
+    
+    // Add active class to clicked tab
+    event.target.classList.add('active');
+}
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const form = document.getElementById('profileForm');
+    const inputs = form.querySelectorAll('input, select');
+    const editBtn = document.getElementById('editBtnText');
+    const saveButtons = document.getElementById('saveButtons');
+    
+    if (isEditMode) {
+        inputs.forEach(input => {
+            if (input.name !== 'email') { // Keep email readonly
+                input.removeAttribute('readonly');
+                input.removeAttribute('disabled');
+            }
+        });
+        editBtn.textContent = 'Cancel Edit';
+        saveButtons.style.display = 'block';
+    } else {
+        inputs.forEach(input => {
+            input.setAttribute('readonly', '');
+            if (input.tagName === 'SELECT') {
+                input.setAttribute('disabled', '');
+            }
+        });
+        editBtn.textContent = 'Edit Profile';
+        saveButtons.style.display = 'none';
+    }
+}
+
+function toggleCompanyEditMode() {
+    isCompanyEditMode = !isCompanyEditMode;
+    const form = document.getElementById('companyForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const editBtn = document.getElementById('companyEditBtnText');
+    const saveButtons = document.getElementById('companySaveButtons');
+    
+    if (isCompanyEditMode) {
+        inputs.forEach(input => {
+            input.removeAttribute('readonly');
+            input.removeAttribute('disabled');
+        });
+        editBtn.textContent = 'Cancel Edit';
+        saveButtons.style.display = 'block';
+    } else {
+        inputs.forEach(input => {
+            input.setAttribute('readonly', '');
+            if (input.tagName === 'SELECT') {
+                input.setAttribute('disabled', '');
+            }
+        });
+        editBtn.textContent = 'Edit Company Details';
+        saveButtons.style.display = 'none';
+    }
+}
+
+function cancelEdit() {
+    location.reload(); // Simple way to reset form
+}
+
+function cancelCompanyEdit() {
+    location.reload(); // Simple way to reset form
+}
+
+function uploadProfilePicture(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('Image file too large. Maximum size is 5MB.', 'error');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        
+        // Show loading
+        showNotification('Uploading profile picture...', 'info');
+        
+        fetch('/upload_hr_profile_picture', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('profileImage').src = data.image_url + '?t=' + Date.now();
+                showNotification('Profile picture updated successfully!', 'success');
+            } else {
+                showNotification(data.message || 'Failed to upload profile picture', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error uploading profile picture', 'error');
+        });
+    }
+}
+
+function showNotification(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+    const notification = `
+        <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+             style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', notification);
+    
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 5000);
+}
+</script>
+
+{% endblock %}

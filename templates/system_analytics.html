@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Analytics Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">Resume Ranking System</a>
+            <span class="navbar-text">Analytics Dashboard</span>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>System Analytics Dashboard</h2>
+        <p class="text-muted">Generated at: {{ timestamp }}</p>
+
+        {% if error %}
+        <div class="alert alert-danger">
+            <h4>Error</h4>
+            <p>{{ error }}</p>
+        </div>
+        {% else %}
+
+        <!-- System Overview -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>System Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3>{{ analytics.system_overview.activity_summary.applications_last_30_days }}</h3>
+                                        <p>Applications (30 days)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3>{{ analytics.system_overview.activity_summary.jobs_posted_last_30_days }}</h3>
+                                        <p>Jobs Posted (30 days)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3>{{ analytics.system_overview.activity_summary.new_users_last_30_days }}</h3>
+                                        <p>New Users (30 days)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h3>{{ analytics.system_overview.engagement_metrics.avg_applications_per_job }}</h3>
+                                        <p>Avg Applications/Job</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bias Analytics -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Bias Analytics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Average Fairness Score:</strong> 
+                           <span class="badge bg-{{ 'success' if analytics.bias_analytics.overall_fairness.average_fairness_score > 0.8 else 'warning' if analytics.bias_analytics.overall_fairness.average_fairness_score > 0.6 else 'danger' }}">
+                               {{ "%.3f" | format(analytics.bias_analytics.overall_fairness.average_fairness_score) }}
+                           </span>
+                        </p>
+                        <p><strong>Bias Corrections Applied:</strong> {{ analytics.bias_analytics.overall_fairness.bias_corrections_applied }}</p>
+                        <p><strong>Bias Incidents:</strong> {{ analytics.bias_analytics.overall_fairness.bias_incidents }}</p>
+                        
+                        <h6>Fairness Distribution:</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar bg-success" style="width: {{ (analytics.bias_analytics.bias_distribution.high_fairness / (analytics.bias_analytics.bias_distribution.high_fairness + analytics.bias_analytics.bias_distribution.medium_fairness + analytics.bias_analytics.bias_distribution.low_fairness + 1)) * 100 }}%">
+                                High ({{ analytics.bias_analytics.bias_distribution.high_fairness }})
+                            </div>
+                            <div class="progress-bar bg-warning" style="width: {{ (analytics.bias_analytics.bias_distribution.medium_fairness / (analytics.bias_analytics.bias_distribution.high_fairness + analytics.bias_analytics.bias_distribution.medium_fairness + analytics.bias_analytics.bias_distribution.low_fairness + 1)) * 100 }}%">
+                                Medium ({{ analytics.bias_analytics.bias_distribution.medium_fairness }})
+                            </div>
+                            <div class="progress-bar bg-danger" style="width: {{ (analytics.bias_analytics.bias_distribution.low_fairness / (analytics.bias_analytics.bias_distribution.high_fairness + analytics.bias_analytics.bias_distribution.medium_fairness + analytics.bias_analytics.bias_distribution.low_fairness + 1)) * 100 }}%">
+                                Low ({{ analytics.bias_analytics.bias_distribution.low_fairness }})
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Performance Metrics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Average Matching Score:</strong> {{ "%.2f" | format(analytics.performance_metrics.matching_accuracy.average_score) }}%</p>
+                        <p><strong>Processing Success Rate:</strong> {{ "%.2f" | format(analytics.performance_metrics.processing_efficiency.success_rate) }}%</p>
+                        <p><strong>Average Processing Time:</strong> {{ "%.2f" | format(analytics.performance_metrics.processing_efficiency.average_processing_time) }}ms</p>
+                        
+                        <h6>Score Distribution:</h6>
+                        <ul class="list-unstyled">
+                            <li>Excellent (80+): {{ analytics.performance_metrics.matching_accuracy.score_distribution.excellent }}</li>
+                            <li>Good (60-80): {{ analytics.performance_metrics.matching_accuracy.score_distribution.good }}</li>
+                            <li>Fair (40-60): {{ analytics.performance_metrics.matching_accuracy.score_distribution.fair }}</li>
+                            <li>Poor (<40): {{ analytics.performance_metrics.matching_accuracy.score_distribution.poor }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Insights -->
+        {% if analytics.learning_effectiveness %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Dynamic Learning Insights</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>Learning Status</h6>
+                                <p>Status: <span class="badge bg-info">{{ analytics.learning_effectiveness.status or 'Active' }}</span></p>
+                                <p>Accuracy Improvement: {{ "%.3f" | format(analytics.learning_effectiveness.improvement or 0) }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Feedback Analytics</h6>
+                                <p>Total Feedback: {{ analytics.learning_effectiveness.total_feedback_count or 0 }}</p>
+                                <p>Recent Accuracy: {{ "%.3f" | format(analytics.learning_effectiveness.recent_accuracy or 0) }}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>System Adaptation</h6>
+                                <p>Weight Adjustments: {{ analytics.learning_effectiveness.adjustments_made or 0 }}</p>
+                                <p>Effectiveness: <span class="badge bg-success">{{ analytics.learning_effectiveness.effectiveness or 'Good' }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recommendations -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>System Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for recommendation in analytics.recommendations %}
+                        <div class="alert alert-{{ 'danger' if recommendation.priority == 'high' else 'warning' if recommendation.priority == 'medium' else 'info' }}">
+                            <h6>{{ recommendation.title }} <span class="badge bg-{{ 'danger' if recommendation.priority == 'high' else 'warning' if recommendation.priority == 'medium' else 'info' }}">{{ recommendation.priority.upper() }}</span></h6>
+                            <p>{{ recommendation.description }}</p>
+                            <ul>
+                                {% for action in recommendation.action_items %}
+                                <li>{{ action }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Add interactive charts if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bias distribution chart
+            const ctx = document.getElementById('biasChart');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['High Fairness', 'Medium Fairness', 'Low Fairness'],
+                        datasets: [{
+                            data: [
+                                {{ analytics.bias_analytics.bias_distribution.high_fairness }},
+                                {{ analytics.bias_analytics.bias_distribution.medium_fairness }},
+                                {{ analytics.bias_analytics.bias_distribution.low_fairness }}
+                            ],
+                            backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                        }]
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

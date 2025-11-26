@@ -1,0 +1,2698 @@
+<!--Company_Candidates.html-->
+{% extends "base.html" %}
+{% block body_class %}hr-dashboard{% endblock %}
+{% block title %}Company Candidates{% endblock %}
+
+{% block Addnav %}
+
+{% endblock %}
+
+{% block content %}
+<style>
+  .fit-prediction {
+  margin-top: 0.75rem;
+}
+
+.fit-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.fit-badge-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.fit-badge-qualifier {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.fit-badge.excellent {
+  background: #dcfce7;
+  color: #166534;
+  border-left: 4px solid #10b981;
+}
+
+.fit-badge.good {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border-left: 4px solid #3b82f6;
+}
+
+.fit-badge.moderate {
+  background: #fef3c7;
+  color: #92400e;
+  border-left: 4px solid #f59e0b;
+}
+
+.fit-badge.weak {
+  background: #fee2e2;
+  color: #991b1b;
+  border-left: 4px solid #ef4444;
+}
+.bg-green {
+  background-color: #28a745 !important;
+}
+
+.bg-blue {
+  background-color: #007bff !important;
+}
+
+.bg-orange {
+  background-color: #ffc107 !important;
+}
+
+.bg-red {
+  background-color: #dc3545 !important;
+}
+
+.feedback-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    overflow-y: auto;
+}
+
+.feedback-modal-content {
+    background: white;
+    margin: 2rem auto;
+    padding: 0;
+    border-radius: 1rem;
+    max-width: 900px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+/* SCORE BREAKDOWN MODAL STYLES */
+.score-breakdown-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 1rem 1rem 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 6rem;
+}
+
+.breakdown-title-section h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.breakdown-subtitle {
+    margin: 0.5rem 0 0 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.score-breakdown-body {
+    padding: 2rem;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.overall-score-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    border: 2px solid #e2e8f0;
+}
+
+.score-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.score-main {
+    margin-bottom: 1rem;
+}
+
+.score-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.score-rating {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.score-message {
+    font-size: 1.1rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.components-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: #1e293b;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+}
+
+.score-component-card {
+    background: white;
+    border: 2px solid #f1f5f9;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.score-component-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.component-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.component-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.component-info {
+    flex: 1;
+}
+
+.component-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.component-description {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.component-score {
+    font-size: 1.75rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.component-progress-bar {
+    width: 100%;
+    height: 32px;
+    background: #f1f5f9;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+}
+
+.component-progress-fill {
+    height: 100%;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.8s ease;
+    position: relative;
+}
+
+.progress-text {
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.suggestions-section {
+    background: #fefce8;
+    border: 2px solid #fef08a;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.suggestions-section h5 {
+    color: #854d0e;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.suggestions-list li {
+    padding: 0.75rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: #713f12;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.suggestions-list li:before {
+    content: "💡";
+    position: absolute;
+    left: 0;
+}
+
+.suggestions-list li:not(:last-child) {
+    border-bottom: 1px solid #fef08a;
+}
+
+/* TECHNICAL DETAILS SECTION */
+.technical-details-section {
+    margin-top: 2rem;
+    border-top: 2px solid #f1f5f9;
+    padding-top: 2rem;
+}
+
+.details-toggle {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.details-toggle:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.details-toggle-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+    color: #64748b;
+    font-size: 1.25rem;
+}
+
+.toggle-icon.rotated {
+    transform: rotate(180deg);
+}
+
+.details-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+}
+
+.details-content.expanded {
+    max-height: 5000px;
+}
+
+/* DETAILED MATCH ANALYSIS */
+.match-details-section {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.match-details-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.match-category {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.match-category-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.category-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.category-icon-large {
+    font-size: 1.75rem;
+}
+
+.category-title-text h6 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.category-subtitle {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.category-score-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.match-items-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.match-column {
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 1rem;
+}
+
+.match-column-title {
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.match-column-title.matched {
+    color: #10b981;
+}
+
+.match-column-title.missing {
+    color: #ef4444;
+}
+
+.match-item-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.match-item {
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
+    background: white;
+    border-radius: 0.375rem;
+    border-left: 3px solid;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.match-item.matched {
+    border-color: #10b981;
+    color: #047857;
+}
+
+.match-item.missing {
+    border-color: #ef4444;
+    color: #b91c1c;
+}
+
+.match-item-icon {
+    flex-shrink: 0;
+}
+
+.match-empty {
+    text-align: center;
+    padding: 1rem;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    font-style: italic;
+}
+
+.experience-comparison {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.exp-box {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+}
+
+.exp-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.exp-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.exp-comparison-icon {
+    font-size: 2rem;
+}
+
+.keyword-matches {
+    margin-top: 1rem;
+}
+
+.keyword-title {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1e293b;
+    margin-bottom: 0.75rem;
+}
+
+.keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.keyword-tag {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.813rem;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.keyword-tag.matched {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #166534;
+}
+
+.insight-box {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 2px solid #fbbf24;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.insight-title {
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.insight-text {
+    font-size: 0.875rem;
+    color: #78350f;
+    line-height: 1.6;
+}
+
+.methodology-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.methodology-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.methodology-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.methodology-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.method-icon {
+    font-size: 2rem;
+}
+
+.method-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.method-subtitle {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin: 0.25rem 0 0 0;
+}
+
+.method-score {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.method-weight {
+    background: #f8fafc;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.calculation-section {
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.calculation-title {
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.calculation-formula {
+    background: white;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Courier New', monospace;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.formula-line {
+    margin: 0.5rem 0;
+    color: #1e293b;
+}
+
+.formula-result {
+    font-weight: 700;
+    color: #3b82f6;
+    font-size: 1.1rem;
+    padding-top: 0.5rem;
+    border-top: 2px solid #e2e8f0;
+    margin-top: 0.75rem;
+}
+
+.weights-breakdown {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.weight-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.weight-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.weight-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.processing-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+.info-card-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.info-card-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.info-card-unit {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.ai-enhancement-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.breakdown-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 2px solid #f1f5f9;
+}
+
+.info-badge {
+    background: #f0f9ff;
+    color: #075985;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-view {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-view:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+.btn-documents {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-documents:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+}
+
+.action-btn:disabled {
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: 1px solid #e0e0e0;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.dropdown-item i {
+  margin-right: 8px;
+  color: #667eea;
+}
+
+.dropdown-item small {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.candidates-page {
+ background: #fafafa;
+  border-top: 4px solid #8bb7ff; /* Small brand accent */
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.page-header {
+background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ai-status-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.375rem;
+}
+
+.bg-success { background-color: #10b981; }
+.bg-warning { background-color: #f59e0b; color: #000; }
+.bg-danger { background-color: #ef4444; }
+.bg-secondary { background-color: #6b7280; }
+
+.ai-features-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.controls-section {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.filter-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input, .filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 300px;
+}
+
+.search-input:focus, .filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select {
+  background: white;
+  min-width: 200px;
+  cursor: pointer;
+}
+
+.btn-enhanced {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-ai-rank {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.btn-ai-rank:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+
+
+
+.btn-export {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-export:hover {
+  background: linear-gradient(135deg, #059669, #065f46);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.candidates-section {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.section-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.candidates-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.candidates-table th,
+.candidates-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.candidates-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+}
+
+.candidate-row {
+  transition: all 0.2s ease;
+}
+
+.candidate-row:hover {
+  background-color: #f8fafc;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.rank-1 { 
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white;
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+}
+
+.rank-2 { 
+  background: linear-gradient(135deg, #9ca3af, #6b7280);
+  color: white;
+  box-shadow: 0 4px 12px rgba(156, 163, 175, 0.3);
+}
+
+.rank-3 { 
+  background: linear-gradient(135deg, #fb923c, #ea580c);
+  color: white;
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.3);
+}
+
+.candidate-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.candidate-details h4 {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.candidate-meta {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.ai-enhanced-badge {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  display: inline-block;
+}
+
+.match-score {
+  text-align: center;
+}
+
+.score-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.score-high { color: #10b981; }
+.score-med { color: #3b82f6; }
+.score-low { color: #ef4444; }
+
+.progress-bar-container {
+  width: 100%;
+  height: 0.5rem;
+  background-color: #e5e7eb;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 0.25rem;
+  transition: width 0.3s ease;
+}
+
+.bg-green { background-color: #10b981; }
+.bg-blue { background-color: #3b82f6; }
+.bg-red { background-color: #ef4444; }
+
+.ai-scores-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ai-score-item {
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 0.375rem;
+  text-align: center;
+}
+
+.status-select {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  border: 2px solid #e5e7eb;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.status-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.status-pending { background-color: #f3f4f6; color: #374151; }
+.status-review { background-color: #fef3c7; color: #92400e; }
+.status-shortlisted { background-color: #dcfce7; color: #166534; }
+.status-interviewed { background-color: #ede9fe; color: #6b21a8; }
+.status-rejected { background-color: #fee2e2; color: #991b1b; }
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.btn-view { 
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1d4ed8;
+}
+
+.btn-view:hover { 
+  background: linear-gradient(135deg, #bfdbfe, #93c5fd);
+  color: #1e40af;
+  text-decoration: none;
+}
+
+.btn-insights { 
+  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+  color: #7c3aed;
+}
+
+.btn-insights:hover { 
+  background: linear-gradient(135deg, #ddd6fe, #c4b5fd);
+  color: #6d28d9;
+  text-decoration: none;
+}
+
+.btn-feedback { 
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  color: #16a34a;
+}
+
+.btn-feedback:hover { 
+  background: linear-gradient(135deg, #bbf7d0, #86efac);
+  color: #15803d;
+  text-decoration: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.modal-enhanced .modal-content {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.modal-enhanced .modal-header {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: none;
+  padding: 1.5rem;
+}
+
+.modal-enhanced .modal-body {
+  padding: 2rem;
+}
+
+.modal-enhanced .modal-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-control,
+.form-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: white;
+  opacity: 0.7;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+.alert-enhanced {
+  border-radius: 0.75rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+  border-left: 4px solid #0ea5e9;
+  color: #0369a1;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  border-left: 4px solid #10b981;
+  color: #065f46;
+}
+
+.ai-ranking-results {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    min-width: auto;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .candidates-page {
+    padding: 1rem 0;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .candidates-table th,
+  .candidates-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+  
+  .candidate-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .candidate-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+  }
+  
+  .action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-scores-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .rank-badge {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+  }
+}
+</style>
+
+<div class="candidates-page">
+  <!-- AI Status Indicator -->
+<!-- <div class="ai-status-indicator">
+    <span id="ai-status-badge" class="badge bg-secondary">🤖 Checking AI...</span>
+  </div>-->
+
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h1 class="h2 mb-2">Candidate Rankings</h1>
+          <p class="mb-0 opacity-90">Review and manage candidates <!--with advanced AI analysis--></p>
+        </div>
+        
+        <!-- Job Filter -->
+          <div class="d-flex gap-3 align-items-center">
+    <!-- Job Filter -->
+    <select id="jobFilter" 
+            class="filter-select"
+            onchange="applyFilters()">
+      <option value="">All Job Postings</option>
+      {% for job in jobs %}
+      <option value="{{ job._id }}" {% if selected_job_id == job._id|string %}selected{% endif %}>
+        {{ job.Job_Profile }}
+      </option>
+      {% endfor %}
+    </select>
+    <select id="statusFilter" 
+            class="filter-select"
+            onchange="applyFilters()">
+      {% for status in available_statuses %}
+      <option value="{{ status.value }}" {% if selected_status == status.value %}selected{% endif %}>
+        {{ status.label }}
+      </option>
+      {% endfor %}
+    </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Features Panel 
+    <div class="ai-features-panel">
+      <h3 class="h4 mb-4">🤖 AI-Powered Features</h3>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <h5 class="font-semibold mb-2">Semantic Skill Matching</h5>
+          <p class="text-sm opacity-80">Advanced NLP analyzes skill relevance beyond keyword matching</p>
+        </div>
+      
+      </div>
+    </div>-->
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <div class="d-flex justify-content-between align-items-center mb-3 gap-3">
+         <div class="filter-section">
+        <div class="position-relative flex-grow-1">
+          <input type="search"
+                 id="searchInput"
+                 placeholder="Search candidates..."
+                 class="search-input"
+                 oninput="filterCandidates()" />
+          <div class="position-absolute top-50 start-0 translate-middle-y ms-3">
+         
+          </div>
+        </div>
+      </div>
+       
+        
+        <button class="btn-enhanced btn-export" onclick="exportData()">
+          📊 Export Data
+        </button>
+      </div>
+      
+      <!-- AI Ranking Results -->
+      <div id="ai-ranking-results" class="ai-ranking-results" style="display: none;"></div>
+      
+      <!-- Search Controls 
+      <div class="filter-section">
+        <div class="position-relative flex-grow-1">
+          <input type="search"
+                 id="searchInput"
+                 placeholder="Search candidates..."
+                 class="search-input"
+                 oninput="filterCandidates()" />
+          <div class="position-absolute top-50 start-0 translate-middle-y ms-3">
+         
+          </div>
+        </div>
+      </div>-->
+    </div>
+
+    <!-- Statistics Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-number text-primary">{{ stats.total_candidates }}</div>
+    <div class="stat-label">Total Applications</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number text-info">{{ stats.under_review }}</div>
+    <div class="stat-label">Under Review</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number text-success">{{ stats.shortlisted }}</div>
+    <div class="stat-label">Shortlisted</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number text-warning">{{ stats.interview_pending }}</div>
+    <div class="stat-label">Interview Pending</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-number" style="color: #8b5cf6;">{{ stats.interviewed }}</div>
+    <div class="stat-label">Interviewed</div>
+  </div>
+</div>
+
+    <!-- Main Candidates Section -->
+    <section class="candidates-section">
+      <!-- Section Header -->
+      <div class="section-header">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h2 class="h4 mb-1">Candidate Rankings</h2>
+            <p class="text-muted mb-0">
+              {% if selected_job_title %}
+                Showing candidates for: <span class="fw-medium">{{ selected_job_title }}</span>
+              {% else %}
+                Showing all candidates across job postings
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Candidates Table -->
+      <div class="table-container">
+        <table class="candidates-table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Candidate</th>
+              <th>Job Position</th>
+              <th>Match Score</th>
+             <!-- <th>AI Scores</th>-->
+              <th>Predictive Job fit</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="candidatesTableBody">
+            {% for candidate in candidates %}
+            <tr class="candidate-row" data-job-id="{{ candidate.job_id }}">
+              <!-- Rank -->
+              <td>
+                {% if candidate.rank <= 3 %}
+                  <span class="rank-badge rank-{{ candidate.rank }}">{{ candidate.rank }}</span>
+                {% else %}
+                  <span class="text-muted fw-medium">{{ candidate.rank }}</span>
+                {% endif %}
+              </td>
+              
+              <!-- Candidate Info -->
+              <td>
+                <div class="candidate-info">
+                  <div class="candidate-avatar">
+                    {{ (candidate.name or 'U')[0]|upper }}
+                  </div>
+                  <div class="candidate-details">
+                    <h4>{{ candidate.name or 'Unknown Candidate' }}</h4>
+                    
+                  </div>
+                </div>
+              </td>
+              
+              <!-- Job Position -->
+              <td>
+                <div class="fw-medium text-dark">{{ candidate.job_title }}</div>
+                <div class="small text-muted">Applied {{ candidate.applied_date.strftime('%b %d, %Y') if candidate.applied_date else 'Recently' }}</div>
+              </td>
+              
+              <!-- Match Score -->
+              <td>
+                <div class="match-score">
+                  <div class="score-value
+                    {% if candidate.match_score >= 85 %} score-high
+                    {% elif candidate.match_score >= 70 %} score-med  
+                    {% else %} score-low
+                    {% endif %}">
+                    {{ candidate.match_score }}%
+                  </div>
+              
+              </td>
+              
+           
+                
+                </div>
+              
+              <!-- Match Score with Predictive Fit -->
+              <td>
+                <!-- <div class="match-score">
+                  <div class="score-value
+                    {% if candidate.match_score >= 80 %} score-high
+                    {% elif candidate.match_score >= 65 %} score-med  
+                    {% elif candidate.match_score >= 50 %} score-moderate
+                    {% else %} score-low
+                    {% endif %}">
+                    {{ candidate.match_score }}%
+                  </div> -->
+                  <div class="progress-bar-container">
+                    <div class="progress-bar 
+                      {% if candidate.match_score >= 80 %} bg-green
+                      {% elif candidate.match_score >= 65 %} bg-blue
+                      {% elif candidate.match_score >= 50 %} bg-orange
+                      {% else %} bg-red
+                      {% endif %}" 
+                      style="width: {{ candidate.match_score }}%">
+                    </div>
+                  </div>
+                <div class="fit-prediction">
+  {% if candidate.match_score >= 80 %}
+    <span class="fit-badge excellent">
+      <span class="fit-badge-label">🌟 Excellent Fit</span>
+      <span class="fit-badge-qualifier">Qualified</span>
+    </span>
+  {% elif candidate.match_score >= 65 %}
+    <span class="fit-badge good">
+      <span class="fit-badge-label">✨ Good Fit</span>
+      <span class="fit-badge-qualifier">Qualified</span>
+    </span>
+  {% elif candidate.match_score >= 50 %}
+    <span class="fit-badge moderate">
+      <span class="fit-badge-label">💡 Moderate Fit</span>
+      <span class="fit-badge-qualifier">Not Qualified</span>
+    </span>
+  {% else %}
+    <span class="fit-badge weak">
+      <span class="fit-badge-label">📚 Weak Fit</span>
+      <span class="fit-badge-qualifier">Not Qualified</span>
+    </span>
+  {% endif %}
+</div>
+                </div>
+              </td>
+              <!-- Status -->
+              <td>
+  <select class="status-select 
+    {% if candidate.status == 'shortlisted' %} status-shortlisted
+    {% elif candidate.status == 'interview_pending' %} status-pending
+    {% elif candidate.status == 'not_selected' %} status-rejected
+    {% elif candidate.status == 'interviewed' %} status-interviewed
+    {% elif candidate.status == 'under_review' %} status-review
+    {% else %} status-pending
+    {% endif %}" 
+    onchange="updateStatus('{{ candidate.application_id }}', this.value)">
+    
+    <option value="under_review" {% if candidate.status == 'under_review' %}selected{% endif %}>Under Review</option>
+    <option value="shortlisted" {% if candidate.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+    <option value="interview_pending" {% if candidate.status == 'interview_pending' %}selected{% endif %}>Interview Pending</option>
+    <option value="interview_scheduled" {% if candidate.status == 'interview_scheduled' %}selected{% endif %}>Interview Scheduled</option>
+    <option value="interviewed" {% if candidate.status == 'interviewed' %}selected{% endif %}>Interviewed</option>
+    <option value="not_selected" {% if candidate.status == 'not_selected' %}selected{% endif %}>Not Selected</option>
+  </select>
+</td>
+
+              
+              <!-- Actions -->
+              <td>
+                <div class="action-buttons">
+   {% if candidate.component_scores or (candidate.Matching_percentage and candidate.Matching_percentage.component_scores) %}
+    <button class="action-btn btn-view" 
+            data-component-scores='{{ (candidate.component_scores or (candidate.Matching_percentage.component_scores if candidate.Matching_percentage else {}))|tojson }}'
+            data-match-score="{{ candidate.match_score }}"
+            data-job-title="{{ candidate.job_title }}"
+            data-candidate-feedback='{{ (candidate.candidate_feedback or (candidate.Matching_percentage.candidate_feedback if candidate.Matching_percentage else None))|tojson if (candidate.candidate_feedback or (candidate.Matching_percentage and candidate.Matching_percentage.candidate_feedback)) else "null" }}'
+            data-detailed-match='{{ (candidate.detailed_match_info or (candidate.Matching_percentage.detailed_match if candidate.Matching_percentage else None))|tojson if (candidate.detailed_match_info or (candidate.Matching_percentage and candidate.Matching_percentage.detailed_match)) else "null" }}'
+            onclick="showScoreBreakdownFromButton(this)">
+      <i class="bi bi-graph-up"></i> View Score Breakdown
+    </button>
+    {% endif %}
+
+
+                  {% if candidate.resume_id %}
+                  <a href="{{ url_for('view_candidate_resume', resume_id=candidate.resume_id) }}"
+                     target="_blank"
+                     class="action-btn btn-view">
+                    <i class="bi bi-file-earmark-pdf"></i> View Resume
+                  </a>
+                  {% else %}
+                  <button class="action-btn btn-view" disabled>
+                    No Resume
+                  </button>
+                  {% endif %}
+                
+               <!-- Additional Documents Dropdown -->
+{% if candidate.user_documents and candidate.user_documents|length > 0 %}
+<div class="dropdown d-inline-block">
+  <button class="action-btn btn-documents dropdown-toggle" 
+          type="button" 
+          id="docsDropdown{{ candidate.user_id }}" 
+          data-bs-toggle="dropdown" 
+          aria-expanded="false">
+    <i class="bi bi-folder2-open"></i> 
+    Documents ({{ candidate.user_documents|length }})
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="docsDropdown{{ candidate.user_id }}">
+    {% for doc in candidate.user_documents %}
+    <li>
+      <div class="dropdown-item-group">
+        <a class="dropdown-item doc-view-link" 
+           href="{{ url_for('view_candidate_document', document_id=doc._id) }}" 
+           target="_blank">
+          <i class="bi bi-file-earmark-text"></i>
+          <div class="doc-info">
+            <span class="doc-name">{{ doc.DocumentName or doc.FileName or 'Document' }}</span>
+            <small class="text-muted">
+              {{ doc.Category or 'File' }} • 
+              {{ doc.UploadedAt.strftime('%b %d, %Y') if doc.UploadedAt else 'N/A' }}
+            </small>
+          </div>
+        </a>
+        <!-- <a href="{{ url_for('download_candidate_document', document_id=doc._id) }}" 
+           class="doc-download-btn" 
+           title="Download">
+          <i class="bi bi-download"></i>
+        </a> -->
+      </div>
+    </li>
+    {% if not loop.last %}
+    <li><hr class="dropdown-divider"></li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
+<button class="action-btn btn-documents" disabled>
+  <i class="bi bi-folder2"></i> No Documents
+</button>
+{% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Empty State -->
+      {% if not candidates %}
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <h3 class="h5 mb-2">No candidates found</h3>
+        <p class="text-muted mb-4">
+          {% if selected_job_title %}
+            No candidates have applied for "{{ selected_job_title }}" yet.
+          {% else %}
+            No candidates have applied to any job postings yet.
+          {% endif %}
+        </p>
+        <a href="/HR1/Company_Job_Posting" class="btn-enhanced btn-export text-decoration-none">
+          Manage Job Postings
+        </a>
+      </div>
+      {% endif %}
+      
+    </section>
+  </div>
+</div>
+
+<!-- Feedback Modal 
+<div class="modal modal-enhanced" id="feedbackModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          💬 Provide Feedback
+        </h5>
+        <button type="button" class="btn-close" onclick="closeFeedbackModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="feedbackForm">
+          <div class="form-group">
+            <label for="feedbackType" class="form-label">Feedback Type</label>
+            <select class="form-select" id="feedbackType" required>
+              <option value="">Select type...</option>
+              <option value="ranking">Ranking Quality</option>
+              <option value="interview">Interview Performance</option>
+              <option value="hire">Hiring Decision</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="rating" class="form-label">Rating (1-5)</label>
+            <select class="form-select" id="rating" required>
+              <option value="">Select rating...</option>
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Good</option>
+              <option value="3">3 - Average</option>
+              <option value="2">2 - Poor</option>
+              <option value="1">1 - Very Poor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="comments" class="form-label">Comments</label>
+            <textarea class="form-control" id="comments" rows="3" placeholder="Additional feedback..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-enhanced" style="background: #6b7280; color: white;" onclick="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn-enhanced btn-export" onclick="submitFeedback()">Submit Feedback</button>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+<!-- AI Insights Modal 
+<div class="modal modal-enhanced" id="insightsModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          🧠 AI Candidate Insights
+        </h5>
+        <button type="button" class="btn-close" onclick="closeInsightsModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="insightsContent">
+        Dynamic content
+      </div>
+    </div>
+  </div>
+</div>
+-->
+<!-- Status Confirmation Modal -->
+<div class="modal modal-enhanced" id="statusModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          ✅ Confirm Status Update
+        </h5>
+        <button type="button" class="btn-close" onclick="closeStatusModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Are you sure you want to update this candidate's status?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-enhanced" style="background: #6b7280; color: white;" onclick="closeStatusModal()">Cancel</button>
+        <button type="button" class="btn-enhanced btn-export" onclick="confirmStatusUpdate()">Update Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Score Breakdown Modal for HR -->
+<!-- Score Breakdown Modal for HR -->
+<div id="feedbackModal" class="feedback-modal" style="display: none;">
+  <div class="feedback-modal-content">
+    <div id="feedbackContainer"></div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+let pendingStatusUpdate = null;
+
+// AI Functions
+function rankCandidatesAI() {
+  const jobId = document.getElementById('jobFilter').value;
+  if (!jobId) {
+    showNotification('Please select a job first', 'error');
+    return;
+  }
+  
+  showNotification('Ranking candidates with AI...', 'info');
+  
+  fetch('/HR1/view_applied_candidates', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    body: `job_id=${jobId}`
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.StatusCode === 200 && data.data.length > 0) {
+      const resumeIds = data.data.map(candidate => candidate.user_id);
+      
+      return fetch('/rank_candidates', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          job_id: jobId,
+          resume_ids: resumeIds
+        })
+      });
+    } else {
+      throw new Error('No candidates found for this job');
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      displayAIRankingResults(data.ranked_candidates);
+      showNotification('Ranking completed successfully!', 'success');
+    } else {
+      showNotification('Ranking failed: ' + data.message, 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showNotification('Error: ' + error.message, 'error');
+  });
+}
+
+
+
+
+
+function showCandidateInsights(candidateId) {
+  fetch(`/get_candidate_insights/${candidateId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        showNotification('Insights not available: ' + data.error, 'error');
+        return;
+      }
+      
+      document.getElementById('insightsContent').innerHTML = `
+        <div class="row g-4">
+          <div class="col-12">
+            <h6 class="fw-semibold text-success mb-3">Key Strengths:</h6>
+            <ul class="list-unstyled">
+              ${data.key_factors?.map(factor => `<li class="mb-2">• ${factor}</li>`).join('') || '<li>No specific strengths identified</li>'}
+            </ul>
+          </div>
+          
+          <div class="col-12">
+            <h6 class="fw-semibold text-warning mb-3">Areas of Concern:</h6>
+            <ul class="list-unstyled">
+              ${data.risk_factors?.map(factor => `<li class="mb-2">• ${factor}</li>`).join('') || '<li>No major concerns identified</li>'}
+            </ul>
+          </div>
+          
+          <div class="col-12">
+            <h6 class="fw-semibold text-primary mb-3">AI Confidence Level:</h6>
+            <div class="progress-bar-container">
+              <div class="progress-bar bg-blue" style="width: ${(data.confidence || 0) * 100}%;">
+                <span class="text-white small px-2">${Math.round((data.confidence || 0) * 100)}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('insightsModal').style.display = 'flex';
+    })
+    .catch(error => {
+      console.error('Error fetching insights:', error);
+      showNotification('Failed to load candidate insights', 'error');
+    });
+}
+
+function provideFeedback(candidateId) {
+  document.getElementById('feedbackForm').dataset.candidateId = candidateId;
+  document.getElementById('insightsModal').style.display = 'none';
+  document.getElementById('feedbackModal').style.display = 'flex';
+}
+
+function submitFeedback() {
+  const form = document.getElementById('feedbackForm');
+  const candidateId = form.dataset.candidateId;
+  
+  const feedbackData = {
+    candidate_id: candidateId,
+    job_id: document.getElementById('jobFilter').value,
+    feedback_type: document.getElementById('feedbackType').value,
+    rating: parseFloat(document.getElementById('rating').value),
+    comments: document.getElementById('comments').value
+  };
+  
+  if (!feedbackData.feedback_type || !feedbackData.rating) {
+    showNotification('Please fill in all required fields', 'error');
+    return;
+  }
+  
+  fetch('/feedback', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(feedbackData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('Feedback submitted successfully! ' + data.message, 'success');
+      closeFeedbackModal();
+      
+      if (data.new_weights) {
+        showWeightUpdateNotification(data.new_weights);
+      }
+    } else {
+      showNotification('Failed to submit feedback: ' + data.message, 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    showNotification('Error submitting feedback', 'error');
+  });
+}
+
+function showWeightUpdateNotification(newWeights) {
+  const notification = `
+    <div class="alert-enhanced alert-success">
+      <strong>🎯 AI Learning Update!</strong> Based on your feedback, the ranking weights have been automatically adjusted:
+      <ul class="mt-2 small mb-0">
+        <li>Skills: ${newWeights.skills_preference?.toFixed(1) || 'N/A'}</li>
+        <li>Experience: ${newWeights.experience_preference?.toFixed(1) || 'N/A'}</li>
+        <li>Education: ${newWeights.education_preference?.toFixed(1) || 'N/A'}</li>
+        <li>Certifications: ${newWeights.certification_preference?.toFixed(1) || 'N/A'}</li>
+      </ul>
+    </div>
+  `;
+  
+  const resultsDiv = document.getElementById('ai-ranking-results');
+  resultsDiv.style.display = 'block';
+  resultsDiv.insertAdjacentHTML('afterbegin', notification);
+}
+
+
+
+// Original Functions
+// Updated filterByJob function to maintain status filter
+function filterByJob() {
+  const jobId = document.getElementById('jobFilter').value;
+  const statusFilter = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : '';
+  
+  let url = '/Company_Candidates';
+  let params = [];
+  
+  if (jobId) {
+    params.push(`job_id=${jobId}`);
+  }
+  if (statusFilter && statusFilter !== 'all') {
+    params.push(`status=${statusFilter}`);
+  }
+  
+  if (params.length > 0) {
+    url += '?' + params.join('&');
+  }
+  
+  window.location.href = url;
+}
+
+// New function for status filtering
+function filterByStatus() {
+  const statusFilter = document.getElementById('statusFilter').value;
+  const jobId = document.getElementById('jobFilter') ? document.getElementById('jobFilter').value : '';
+  
+  let url = '/Company_Candidates';
+  let params = [];
+  
+  if (jobId) {
+    params.push(`job_id=${jobId}`);
+  }
+  if (statusFilter && statusFilter !== 'all') {
+    params.push(`status=${statusFilter}`);
+  }
+  
+  if (params.length > 0) {
+    url += '?' + params.join('&');
+  }
+  
+  window.location.href = url;
+}
+
+// Combined filter function
+function applyFilters() {
+  const jobId = document.getElementById('jobFilter').value;
+  const statusFilter = document.getElementById('statusFilter').value;
+  
+  let url = '/Company_Candidates';
+  let params = [];
+  
+  if (jobId) {
+    params.push(`job_id=${jobId}`);
+  }
+  if (statusFilter && statusFilter !== 'all') {
+    params.push(`status=${statusFilter}`);
+  }
+  
+  if (params.length > 0) {
+    url += '?' + params.join('&');
+  }
+  
+  window.location.href = url;
+}
+
+
+function filterCandidates() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('.candidate-row');
+  
+  rows.forEach(row => {
+    const name = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+    const jobTitle = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+    
+    if (name.includes(searchTerm) || jobTitle.includes(searchTerm)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+
+function updateStatus(applicationId, newStatus) {
+  pendingStatusUpdate = {
+    applicationId: applicationId,
+    newStatus: newStatus
+  };
+  
+  document.getElementById('statusModal').style.display = 'flex';
+}
+
+function confirmStatusUpdate() {
+  if (!pendingStatusUpdate) return;
+  
+  fetch('/update_candidate_status', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      application_id: pendingStatusUpdate.applicationId,
+      status: pendingStatusUpdate.newStatus
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('Status updated successfully', 'success');
+      closeStatusModal();
+      setTimeout(() => location.reload(), 1000);
+    } else {
+      showNotification('Error updating status: ' + data.message, 'error');
+    }
+  })
+  .catch(error => {
+    showNotification('Error updating status', 'error');
+    console.error('Error:', error);
+  });
+  
+  pendingStatusUpdate = null;
+}
+
+function viewDetails(candidateId) {
+  window.open(`/candidate_details/${candidateId}`, '_blank');
+}
+
+function exportData() {
+  const jobId = document.getElementById('jobFilter').value;
+  const url = jobId ? `/export_candidates?job_id=${jobId}` : '/export_candidates';
+  window.open(url, '_blank');
+}
+
+// Modal Functions
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').style.display = 'none';
+  document.getElementById('feedbackForm').reset();
+}
+
+function closeInsightsModal() {
+  document.getElementById('insightsModal').style.display = 'none';
+}
+
+function closeStatusModal() {
+  document.getElementById('statusModal').style.display = 'none';
+  if (pendingStatusUpdate) {
+    location.reload();
+  }
+}
+
+// Notification System
+function showNotification(message, type) {
+  const notification = document.createElement('div');
+  notification.className = `position-fixed top-0 end-0 m-4 p-3 rounded shadow-lg ${
+    type === 'success' ? 'bg-success text-white' : 
+    type === 'error' ? 'bg-danger text-white' : 
+    'bg-primary text-white'
+  }`;
+  notification.style.zIndex = '9999';
+  notification.innerHTML = `
+    <div class="d-flex align-items-center gap-2">
+      <span>${message}</span>
+      <button onclick="this.parentElement.parentElement.remove()" class="btn-close btn-close-white ms-2"></button>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.remove();
+    }
+  }, 5000);
+}
+
+
+// Helper function to safely parse button data attributes
+function showScoreBreakdownFromButton(button) {
+    console.log('🔍 BUTTON CLICKED!');
+    
+    try {
+        const componentScoresStr = button.getAttribute('data-component-scores');
+        const detailedMatchStr = button.getAttribute('data-detailed-match');
+        const candidateFeedbackStr = button.getAttribute('data-candidate-feedback');
+        
+        console.log('📊 Component Scores String:', componentScoresStr);
+        console.log('📊 Detailed Match String:', detailedMatchStr);
+        console.log('📊 Feedback String:', candidateFeedbackStr);
+        
+        if (!componentScoresStr || componentScoresStr === 'null') {
+            alert('❌ Score breakdown data is not available.');
+            console.error('❌ No component scores found');
+            return;
+        }
+        
+        const componentScores = JSON.parse(componentScoresStr);
+        console.log('✅ Parsed Component Scores:', componentScores);
+        
+        const overallScore = parseFloat(button.getAttribute('data-match-score'));
+        const jobTitle = button.getAttribute('data-job-title') || 'Unknown Position';
+        
+        const candidateFeedback = (candidateFeedbackStr && candidateFeedbackStr !== 'null') 
+            ? JSON.parse(candidateFeedbackStr) : null;
+        
+        const detailedMatch = (detailedMatchStr && detailedMatchStr !== 'null') 
+            ? JSON.parse(detailedMatchStr) : null;
+        
+        console.log('✅ Parsed Detailed Match:', detailedMatch);
+        console.log('✅ Calling showScoreBreakdown...');
+        
+        showScoreBreakdown(componentScores, overallScore, jobTitle, candidateFeedback, detailedMatch);
+        
+    } catch (error) {
+        console.error('❌ ERROR:', error);
+        console.error('Stack:', error.stack);
+        alert('Unable to display score breakdown. Check console for details.');
+    }
+}
+
+function getScoreColor(score) {
+    if (score >= 80) return '#10b981';
+    if (score >= 60) return '#3b82f6';
+    if (score >= 40) return '#f59e0b';
+    return '#ef4444';
+}
+
+function showScoreBreakdown(componentScores, overallScore, jobTitle, candidateFeedback, detailedMatchInfo) {
+    let rating, ratingColor, ratingIcon, ratingMessage;
+    
+    console.log('=== DETAILED MATCH INFO ===');
+    console.log('detailedMatchInfo:', detailedMatchInfo);
+    console.log('skills:', detailedMatchInfo?.skills);
+    console.log('experience:', detailedMatchInfo?.experience);
+    console.log('education:', detailedMatchInfo?.education);
+    console.log('===========================');
+
+    if (overallScore >= 80) {
+        rating = "Excellent Match";
+        ratingColor = "#10b981";
+        ratingIcon = "🌟";
+        ratingMessage = "You're a strong candidate for this position!";
+    } else if (overallScore >= 65) {
+        rating = "Good Match";
+        ratingColor = "#3b82f6";
+        ratingIcon = "✨";
+        ratingMessage = "You have solid qualifications for this role.";
+    } else if (overallScore >= 50) {
+        rating = "Moderate Match";
+        ratingColor = "#f59e0b";
+        ratingIcon = "💡";
+        ratingMessage = "You meet some requirements with room for improvement.";
+    } else {
+        rating = "Developing Match";
+        ratingColor = "#ef4444";
+        ratingIcon = "📚";
+        ratingMessage = "Consider building more experience in key areas.";
+    }
+    
+    const componentInfo = {
+        'skills': { label: 'Technical Skills', icon: '🔧', description: 'Your skill alignment with job requirements' },
+        'experience': { label: 'Experience Level', icon: '💼', description: 'Years of relevant professional experience' },
+        'education': { label: 'Educational Background', icon: '🎓', description: 'Academic qualifications match' },
+        'certifications': { label: 'Certifications', icon: '📜', description: 'Professional certifications and credentials' }
+    };
+    
+    // Component scores cards
+    let componentsHTML = '';
+    for (const [key, score] of Object.entries(componentScores)) {
+        const info = componentInfo[key] || { label: key, icon: '📊', description: '' };
+        const scoreColor = score >= 80 ? '#10b981' : score >= 60 ? '#3b82f6' : score >= 40 ? '#f59e0b' : '#ef4444';
+        const scoreText = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Fair' : 'Needs Work';
+        
+        componentsHTML += `
+            <div class="score-component-card">
+                <div class="component-header">
+                    <div class="component-icon">${info.icon}</div>
+                    <div class="component-info">
+                        <h6 class="component-title">${info.label}</h6>
+                        <p class="component-description">${info.description}</p>
+                    </div>
+                    <div class="component-score" style="color: ${scoreColor}">
+                        ${score.toFixed(1)}%
+                    </div>
+                </div>
+                <div class="component-progress-bar">
+                    <div class="component-progress-fill" style="width: ${score}%; background: ${scoreColor}">
+                        <span class="progress-text">${scoreText}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+// Detailed Match Analysis Section
+let detailedMatchHTML = '';
+if (detailedMatchInfo && typeof detailedMatchInfo === 'object') {
+    console.log('✅ Generating detailed match HTML...');
+    
+    let matchCategories = '';
+    
+    // Skills
+    if (detailedMatchInfo.skills) {
+        matchCategories += generateMatchCategory('skills', detailedMatchInfo.skills, '🔧', 'Technical Skills', 'Skills required vs your skills', componentScores.skills || 0);
+    }
+    
+    // Experience
+    if (detailedMatchInfo.experience) {
+        matchCategories += generateMatchCategory('experience', detailedMatchInfo.experience, '💼', 'Experience', 'Experience requirements analysis', componentScores.experience || 0);
+    }
+    
+    // Education
+    if (detailedMatchInfo.education) {
+        matchCategories += generateMatchCategory('education', detailedMatchInfo.education, '🎓', 'Education', 'Educational qualifications', componentScores.education || 0);
+    }
+    
+    // Certifications
+    if (detailedMatchInfo.certifications) {
+        matchCategories += generateMatchCategory('certifications', detailedMatchInfo.certifications, '📜', 'Certifications', 'Professional certifications', componentScores.certifications || 0);
+    }
+    
+    if (matchCategories) {
+        detailedMatchHTML = `
+            <div class="match-details-section">
+                <h5 class="match-details-title">
+                    <i class="bi bi-search"></i>
+                    Detailed Match Analysis
+                </h5>
+                ${matchCategories}
+            </div>
+        `;
+        console.log('✅ Detailed match HTML generated!');
+    } else {
+        console.log('⚠️ No match categories generated');
+    }
+} else {
+    console.log('❌ detailedMatchInfo is null or invalid:', detailedMatchInfo);
+}
+    
+    // Suggestions
+    let suggestionsHTML = '';
+    if (candidateFeedback && candidateFeedback.suggestions && candidateFeedback.suggestions.length > 0) {
+        suggestionsHTML = `
+            <div class="suggestions-section">
+                <h5><i class="bi bi-lightbulb me-2"></i>Ways to Improve</h5>
+                <ul class="suggestions-list">
+                    ${candidateFeedback.suggestions.map(suggestion => `<li>${suggestion}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+    
+    // Methodology section (same as before)
+    const TRADITIONAL_WEIGHT = 0.40;
+    const SEMANTIC_WEIGHT = 0.60;
+    
+    const traditionalScore = Object.values(componentScores).reduce((a, b) => a + b, 0) / Object.keys(componentScores).length;
+    const traditionalContribution = traditionalScore * TRADITIONAL_WEIGHT;
+    const semanticContribution = overallScore - traditionalContribution;
+    const semanticScore = semanticContribution / SEMANTIC_WEIGHT;
+    
+    const methodologyHTML = `
+        <div class="technical-details-section">
+            <div class="details-toggle" onclick="toggleDetails(this)">
+                <div class="details-toggle-title">
+                    <i class="bi bi-cpu"></i>
+                    <span>Scoring Methodology & Technical Details</span>
+                </div>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+            </div>
+            
+            <div class="details-content">
+                <div class="methodology-grid">
+                    <div class="methodology-card">
+                        <div class="methodology-header">
+                            <div class="method-icon">📊</div>
+                            <div>
+                                <h6 class="method-title">Traditional Matching</h6>
+                                <p class="method-subtitle">Keyword-based analysis</p>
+                            </div>
+                        </div>
+                        <div class="method-score" style="color: ${getScoreColor(traditionalScore)}">
+                            ${traditionalScore.toFixed(1)}%
+                        </div>
+                        <div class="method-weight">Weight: ${(TRADITIONAL_WEIGHT * 100).toFixed(0)}%</div>
+                    </div>
+                    
+                    <div class="methodology-card">
+                        <div class="methodology-header">
+                            <div class="method-icon">🤖</div>
+                            <div>
+                                <h6 class="method-title"> Semantic Analysis</h6>
+                                <p class="method-subtitle">Deep learning embeddings</p>
+                            </div>
+                        </div>
+                        <div class="method-score" style="color: ${getScoreColor(semanticScore)}">
+                            ${semanticScore.toFixed(1)}%
+                        </div>
+                        <div class="method-weight">Weight: ${(SEMANTIC_WEIGHT * 100).toFixed(0)}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Build final HTML
+    const breakdownHTML = `
+        <div class="score-breakdown-header">
+            <div class="breakdown-title-section">
+                <h3><i class="bi bi-graph-up me-2"></i>Score Breakdown</h3>
+                <p class="breakdown-subtitle">${jobTitle}</p>
+            </div>
+            <button class="close-btn" onclick="closeFeedback()">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        
+        <div class="score-breakdown-body">
+            <div class="overall-score-card">
+                <div class="score-icon">${ratingIcon}</div>
+                <div class="score-main">
+                    <div class="score-number" style="color: ${ratingColor}">${overallScore.toFixed(1)}%</div>
+                    <div class="score-rating" style="color: ${ratingColor}">${rating}</div>
+                </div>
+                <div class="score-message">${ratingMessage}</div>
+            </div>
+            
+            <div class="components-section">
+                <h5 class="section-title"><i class="bi bi-bar-chart me-2"></i>Component Analysis</h5>
+                ${componentsHTML}
+            </div>
+            
+            ${detailedMatchHTML}
+            ${suggestionsHTML}
+            ${methodologyHTML}
+            
+            <div class="breakdown-footer">
+                <div class="info-badge">
+                    <i class="bi bi-info-circle me-2"></i>
+                    This score is based on AI-powered analysis comparing your profile with the job requirements.
+                </div>
+                <button class="btn btn-primary btn-feedback" onclick="closeFeedback()">
+                    <i class="bi bi-check me-2"></i>Got It
+                </button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('feedbackContainer').innerHTML = breakdownHTML;
+    document.getElementById('feedbackModal').style.display = 'block';
+}
+
+// Helper function to generate match category HTML
+function generateMatchCategory(key, data, icon, title, subtitle, score) {
+    console.log(`Generating ${key}:`, data);
+    
+    if (!data) {
+        console.log(`⚠️ No data for ${key}`);
+        return '';
+    }
+    
+    const scoreColor = getScoreColor(score || data.score || 0);
+    const matched = data.matched || [];
+    const missing = data.missing || [];
+    const strengths = data.strengths || [];
+    const weaknesses = data.weaknesses || [];
+    const candidateExtra = data.candidate_extra || [];
+    
+    console.log(`${key} - Matched: ${matched.length}, Missing: ${missing.length}`);
+    
+    return `
+        <div class="match-category">
+            <div class="match-category-header">
+                <div class="category-title-wrapper">
+                    <div class="category-icon-large">${icon}</div>
+                    <div class="category-title-text">
+                        <h6>${title}</h6>
+                        <p class="category-subtitle">${subtitle}</p>
+                    </div>
+                </div>
+                <div class="category-score-badge" style="background-color: ${scoreColor}; color: white;">
+                    ${(score || data.score || 0).toFixed(1)}%
+                </div>
+            </div>
+            
+            ${matched.length > 0 || missing.length > 0 ? `
+                <div class="match-items-grid">
+                    ${matched.length > 0 ? `
+                        <div class="match-column">
+                            <div class="match-column-title matched">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Matched (${matched.length})
+                            </div>
+                            <ul class="match-item-list">
+                                ${matched.map(item => `
+                                    <li class="match-item matched">
+                                        <span class="match-item-icon">✓</span>
+                                        ${item}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : `
+                        <div class="match-column">
+                            <div class="match-empty">No matched ${title.toLowerCase()} found</div>
+                        </div>
+                    `}
+                    
+                    ${missing.length > 0 ? `
+                        <div class="match-column">
+                            <div class="match-column-title missing">
+                                <i class="bi bi-x-circle-fill"></i>
+                                Missing (${missing.length})
+                            </div>
+                            <ul class="match-item-list">
+                                ${missing.map(item => `
+                                    <li class="match-item missing">
+                                        <span class="match-item-icon">✗</span>
+                                        ${item}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : `
+                        <div class="match-column">
+                            <div class="match-empty">All required ${title.toLowerCase()} matched! ✨</div>
+                        </div>
+                    `}
+                </div>
+            ` : `
+                <div class="match-empty">No detailed information available for ${title.toLowerCase()}</div>
+            `}
+            
+            ${candidateExtra.length > 0 ? `
+                <div class="keyword-matches" style="margin-top: 1rem;">
+                    <div class="keyword-title">✨ Additional ${title} You Have</div>
+                    <div class="keyword-tags">
+                        ${candidateExtra.map(item => `
+                            <span class="keyword-tag" style="background: #e0e7ff; border-color: #a5b4fc;">
+                                <i class="bi bi-plus"></i>
+                                ${item}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            
+            ${strengths.length > 0 || weaknesses.length > 0 ? `
+                <div class="insight-box">
+                    <div class="insight-title">
+                        <i class="bi bi-lightbulb-fill"></i>
+                        Key Insights
+                    </div>
+                    <div class="insight-text">
+                        ${strengths.length > 0 ? `<strong>✓ Strengths:</strong> ${strengths.join(', ')}<br>` : ''}
+                        ${weaknesses.length > 0 ? `<strong>○ Areas for Improvement:</strong> ${weaknesses.join(', ')}` : ''}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+function closeFeedback() {
+    document.getElementById('feedbackModal').style.display = 'none';
+}
+
+// Alias for compatibility
+function closeHRScoreModal() {
+    closeFeedback();
+}
+
+// Close on click outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('feedbackModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFeedback();
+            }
+        });
+    }
+});
+
+// Close on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeFeedback();
+    }
+});
+
+function toggleDetails(element) {
+    const content = element.nextElementSibling;
+    const icon = element.querySelector('.toggle-icon');
+    
+    if (content.classList.contains('expanded')) {
+        content.classList.remove('expanded');
+        icon.classList.remove('rotated');
+    } else {
+        content.classList.add('expanded');
+        icon.classList.add('rotated');
+    }
+}
+
+</script>
+
+{% endblock %}

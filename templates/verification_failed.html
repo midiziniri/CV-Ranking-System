@@ -1,0 +1,117 @@
+<!-- verification_failed.html -->
+{% extends "base.html" %}
+{% block title %}Email Verification Failed{% endblock %}
+
+{% block styleInclude %}
+<style>
+.failed-container {
+    max-width: 500px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.failed-icon {
+    font-size: 4rem;
+    color: #f44336;
+    margin-bottom: 1rem;
+}
+
+.failed-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.failed-text {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2196F3, #1976D2);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #757575, #616161);
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.reasons-list {
+    text-align: left;
+    background: #f5f5f5;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin: 1.5rem 0;
+}
+
+.reasons-list ul {
+    margin: 0.5rem 0 0 1.5rem;
+    padding: 0;
+}
+
+.reasons-list li {
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="failed-container">
+        <div class="failed-icon">❌</div>
+        
+        <h1 class="failed-title">Verification Failed</h1>
+        
+        <div class="failed-text">
+            <p>We couldn't verify your email address. This may have happened because:</p>
+        </div>
+        
+        <div class="reasons-list">
+            <ul>
+                <li>The verification link has expired (links are valid for 24 hours)</li>
+                <li>The verification link is invalid or has already been used</li>
+                <li>Your email has already been verified</li>
+            </ul>
+        </div>
+        
+        <div class="failed-text">
+            <p><strong>What can you do?</strong></p>
+            <p>Request a new verification email or try logging in if your account is already verified.</p>
+        </div>
+        
+        <div>
+            <a href="{{ url_for('loginpage') }}" class="btn btn-secondary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
+            </a>
+            <a href="{{ url_for('loginpage') }}" class="btn btn-secondary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Go to Login
+            </a>
+        </div>
+    </div>
+</main>
+{% endblock %}

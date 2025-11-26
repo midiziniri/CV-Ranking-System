@@ -1,0 +1,1109 @@
+{% extends "base.html" %}
+{% block title %}Resume Builder{% endblock %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    @media print {
+        .no-print { display: none; }
+    }
+</style>
+
+
+ <!-- Back Navigation -->
+<div style="padding: 1rem 2rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+    <div style="max-width: 1280px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="bi bi-file-earmark-text" style="font-size: 2rem; color: #3b82f6;"></i>
+            <h1 style="font-size: 1.5rem; font-weight: bold; color: #1f2937; margin: 0;">Resume Builder</h1>
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="/profile" style="padding: 0.5rem 1rem; color: #4b5563; text-decoration: none; border-radius: 0.5rem; transition: all 0.3s;">
+                <i class="bi bi-arrow-left me-2"></i>Back to Profile
+            </a>
+            <a href="/download_resume_template" style="padding: 0.5rem 1rem; background: #4b5563; color: white; text-decoration: none; border-radius: 0.5rem; transition: all 0.3s;">
+                <i class="bi bi-download me-2"></i>Download Blank Template
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div id="resume-builder-root"></div>
+
+{% endblock %}
+
+{% block script %}
+<!-- React and Dependencies -->
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+{% raw %}
+<script type="text/babel">
+    const { useState } = React;
+
+    const ResumeBuilder = () => {
+        const [formData, setFormData] = useState({
+            fullName: '',
+            email: '',
+            phone: '',
+            location: '',
+            linkedin: '',
+            portfolio: '',
+            professionalTitle: '',
+            summary: '',  // ← ADD THIS
+            topSkills: [''],
+            languages: [{ language: '', proficiency: '' }],
+            experiences: [],
+            education: [],
+            certifications: [],
+             additionalSections: []
+        });
+        const [showPreview, setShowPreview] = useState(false);
+        const [isGenerating, setIsGenerating] = useState(false);
+        const [isUploading, setIsUploading] = useState(false); 
+
+        const handleInputChange = (field, value) => {
+            setFormData(prev => ({ ...prev, [field]: value }));
+        };
+
+        const handleArrayChange = (field, index, value) => {
+            setFormData(prev => ({
+                ...prev,
+                [field]: prev[field].map((item, i) => i === index ? value : item)
+            }));
+        };
+
+        const handleNestedChange = (field, index, key, value) => {
+            setFormData(prev => ({
+                ...prev,
+                [field]: prev[field].map((item, i) => 
+                    i === index ? { ...item, [key]: value } : item
+                )
+            }));
+        };
+
+        const addItem = (field, template) => {
+            setFormData(prev => ({
+                ...prev,
+                [field]: [...prev[field], template]
+            }));
+        };
+
+        const removeItem = (field, index) => {
+            setFormData(prev => ({
+                ...prev,
+                [field]: prev[field].filter((_, i) => i !== index)
+            }));
+        };
+
+        const calculateCompleteness = () => {
+            let filledFields = 0;
+            let totalFields = 6;  // Reduced from 10
+
+            if (formData.fullName) filledFields++;
+            if (formData.email) filledFields++;
+            if (formData.phone) filledFields++;
+            if (formData.professionalTitle) filledFields++;
+            if (formData.experiences.some(e => e.company)) filledFields++;
+            if (formData.education.some(e => e.institution)) filledFields++;
+
+            return Math.round((filledFields / totalFields) * 100);
+        };
+
+        const downloadResume = async () => {
+            if (calculateCompleteness() < 50) {
+                alert('Please complete at least 50% of the form before downloading.');
+                return;
+            }
+
+            setIsGenerating(true);
+            
+            try {
+                const response = await fetch('/generate_resume_docx', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate resume');
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Resume_${formData.fullName.replace(/\s+/g, '_') || 'User'}_${new Date().toISOString().split('T')[0]}.docx`;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                if (typeof showNotification === 'function') {
+                    showNotification('Resume downloaded successfully!', 'success');
+                } else {
+                    alert('Resume downloaded successfully!');
+                }
+            } catch (error) {
+                if (typeof showNotification === 'function') {
+                    showNotification('Error generating resume. Please try again.', 'error');
+                } else {
+                    alert('Error generating resume. Please try again.');
+                }
+                console.error(error);
+            } finally {
+                setIsGenerating(false);
+            }
+        };
+
+        const uploadResumeToCollection = async () => {
+    if (calculateCompleteness() < 50) {
+        alert('Please complete at least 50% of the form before uploading.');
+        return;
+    }
+
+    setIsUploading(true);
+    
+    try {
+        const response = await fetch('/upload_generated_resume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to upload resume');
+        }
+
+        const result = await response.json();
+        
+        if (typeof showNotification === 'function') {
+            showNotification('Resume uploaded to your collection!', 'success');
+        } else {
+            alert('Resume uploaded successfully!');
+        }
+
+        // Optionally redirect to profile after upload
+        // setTimeout(() => window.location.href = '/profile', 1500);
+    } catch (error) {
+        if (typeof showNotification === 'function') {
+            showNotification('Error uploading resume. Please try again.', 'error');
+        } else {
+            alert('Error uploading resume. Please try again.');
+        }
+        console.error(error);
+    } finally {
+        setIsUploading(false);
+    }
+};
+
+        const completeness = calculateCompleteness();
+
+        // Inline styles for the components
+        const styles = {
+            container: {
+                maxWidth: '1280px',
+                margin: '0 auto',
+                padding: '2rem 1rem'
+            },
+            card: {
+                background: 'white',
+                borderRadius: '0.5rem',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                padding: '1.5rem',
+                marginBottom: '1.5rem'
+            },
+            flexBetween: {
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1rem',
+                flexWrap: 'wrap',
+                gap: '1rem'
+            },
+            button: {
+                padding: '0.5rem 1rem',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                transition: 'all 0.3s'
+            },
+            buttonGray: {
+                background: '#4b5563',
+                color: 'white'
+            },
+            buttonBlue: {
+                background: '#3b82f6',
+                color: 'white'
+            },
+            progressBar: {
+                width: '100%',
+                height: '12px',
+                background: '#e5e7eb',
+                borderRadius: '0.5rem',
+                overflow: 'hidden'
+            },
+            progressFill: {
+                height: '100%',
+                background: 'linear-gradient(to right, #3b82f6, #10b981)',
+                borderRadius: '0.5rem',
+                transition: 'width 0.3s ease'
+            }
+        };
+
+        return (
+            <div style={styles.container}>
+                {/* Progress Card */}
+                <div style={styles.card}>
+                    <div style={styles.flexBetween}>
+                        <div>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                                Build Your Resume
+                            </h2>
+                            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                                Fill out the form below to create your professional resume
+                            </p>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+    <button
+        onClick={() => setShowPreview(!showPreview)}
+        style={{...styles.button, ...styles.buttonGray}}
+    >
+        <i className={`bi bi-${showPreview ? 'pencil' : 'eye'}`}></i>
+        {showPreview ? 'Edit' : 'Preview'}
+    </button>
+    <button
+        onClick={downloadResume}
+        disabled={isGenerating || isUploading}
+        style={{
+            ...styles.button,
+            ...styles.buttonBlue,
+            opacity: (isGenerating || isUploading) ? 0.5 : 1,
+            cursor: (isGenerating || isUploading) ? 'not-allowed' : 'pointer'
+        }}
+    >
+        <i className="bi bi-download"></i>
+        {isGenerating ? 'Generating...' : 'Download DOCX'}
+    </button>
+    <button
+        onClick={uploadResumeToCollection}
+        disabled={isUploading || isGenerating}
+        style={{
+            ...styles.button,
+            background: '#10b981',
+            color: 'white',
+            opacity: (isUploading || isGenerating) ? 0.5 : 1,
+            cursor: (isUploading || isGenerating) ? 'not-allowed' : 'pointer'
+        }}
+    >
+        <i className="bi bi-cloud-upload"></i>
+        {isUploading ? 'Uploading...' : 'Upload to Resumes'}
+    </button>
+</div>
+                    </div>
+                    
+                    <div>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            fontSize: '0.875rem',
+                            marginBottom: '0.5rem'
+                        }}>
+                            <span style={{ color: '#6b7280' }}>Resume Completeness</span>
+                            <span style={{ fontWeight: '600', color: '#3b82f6' }}>
+                                {completeness}%
+                            </span>
+                        </div>
+                        <div style={styles.progressBar}>
+                            <div style={{...styles.progressFill, width: `${completeness}%`}} />
+                        </div>
+                    </div>
+                </div>
+
+                {showPreview ? (
+                    <ResumePreview formData={formData} />
+                ) : (
+                    <ResumeForm 
+                        formData={formData}
+                        handleInputChange={handleInputChange}
+                        handleArrayChange={handleArrayChange}
+                        handleNestedChange={handleNestedChange}
+                        addItem={addItem}
+                        removeItem={removeItem}
+                    />
+                )}
+            </div>
+        );
+    };
+
+        const ResumeForm = ({ formData, handleInputChange, handleArrayChange, handleNestedChange, addItem, removeItem }) => {
+    return (
+        <div className="space-y-6">
+            {/* Contact Information */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <i className="bi bi-person-circle text-blue-600 text-2xl"></i>
+                    <h2 className="text-xl font-bold text-gray-900">Contact Information</h2>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Full Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.fullName}
+                            onChange={(e) => handleInputChange('fullName', e.target.value)}
+                            placeholder="e.g., John Doe"
+                            required
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Email <span className="text-red-500"></span>
+                        </label>
+                        <input
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange('email', e.target.value)}
+                            placeholder="your.email@example.com"
+                            required
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Phone <span className="text-red-500"></span>
+                        </label>
+                        <input
+                            type="tel"
+                            value={formData.phone}
+                            onChange={(e) => handleInputChange('phone', e.target.value)}
+                            placeholder="Phone Number"
+                            required
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Location
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.location}
+                            onChange={(e) => handleInputChange('location', e.target.value)}
+                            placeholder="City, Country"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            LinkedIn URL
+                        </label>
+                        <input
+                            type="url"
+                            value={formData.linkedin}
+                            onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                            placeholder="www.linkedin.com/in/yourprofile"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div className="col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Portfolio/Website
+                        </label>
+                        <input
+                            type="url"
+                            value={formData.portfolio}
+                            onChange={(e) => handleInputChange('portfolio', e.target.value)}
+                            placeholder="yourportfolio.com"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div className="col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Professional Title
+                        </label>
+                        <input
+                            type="text"
+                            value={formData.professionalTitle}
+                            onChange={(e) => handleInputChange('professionalTitle', e.target.value)}
+                            placeholder="e.g., Python Developer | AI/ML Enthusiast"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            
+
+            {/* Skills Section - NOW PROPERLY INTEGRATED */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="flex items-center gap-2 mb-4">
+                    <i className="bi bi-code-slash text-blue-600 text-2xl"></i>
+                    <h2 className="text-xl font-bold text-gray-900">Skills</h2>
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Top Skills
+                    </label>
+                    
+                    {formData.topSkills.length === 0 ? (
+                        <p className="text-gray-500 text-sm mb-3">
+                            No skills added yet. Add your relevant technical and professional skills.
+                        </p>
+                    ) : (
+                        formData.topSkills.map((skill, idx) => (
+                            <div key={idx} className="flex gap-2 mb-2">
+                                <input
+                                    type="text"
+                                    value={skill}
+                                    onChange={(e) => handleArrayChange('topSkills', idx, e.target.value)}
+                                    placeholder={`Skill ${idx + 1} (e.g., Python, React, AWS)`}
+                                    className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                />
+                                {formData.topSkills.length > 1 && (
+                                    <button
+                                        onClick={() => removeItem('topSkills', idx)}
+                                        className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                        type="button"
+                                    >
+                                        <i className="bi bi-trash"></i>
+                                    </button>
+                                )}
+                            </div>
+                        ))
+                    )}
+                    
+                    <button
+                        onClick={() => addItem('topSkills', '')}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mt-2"
+                        type="button"
+                    >
+                        <i className="bi bi-plus-circle me-2"></i>Add Skill
+                    </button>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Languages
+                    </label>
+                    {formData.languages.map((lang, idx) => (
+                        <div key={idx} className="flex gap-2 mb-2">
+                            <input
+                                type="text"
+                                value={lang.language}
+                                onChange={(e) => handleNestedChange('languages', idx, 'language', e.target.value)}
+                                placeholder="Language"
+                                className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                            />
+                            <input
+                                type="text"
+                                value={lang.proficiency}
+                                onChange={(e) => handleNestedChange('languages', idx, 'proficiency', e.target.value)}
+                                placeholder="Proficiency (e.g., Fluent, Native)"
+                                className="flex-1 px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                            />
+                            {formData.languages.length > 1 && (
+                                <button
+                                    onClick={() => removeItem('languages', idx)}
+                                    className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                    type="button"
+                                >
+                                    <i className="bi bi-trash"></i>
+                                </button>
+                            )}
+                        </div>
+                    ))}
+                    <button
+                        onClick={() => addItem('languages', { language: '', proficiency: '' })}
+                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 mt-2"
+                        type="button"
+                    >
+                        <i className="bi bi-plus-circle me-2"></i>Add Language
+                    </button>
+                </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6">
+            <label className="flex items-center justify-between mb-4">
+                Professional Summary (Optional)
+            </label>
+            <textarea
+                value={formData.summary}
+                onChange={(e) => handleInputChange('summary', e.target.value)}
+                placeholder="Brief overview of your professional background, key skills, and career objectives..."
+                rows="4"
+                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-y"
+            />
+            <small className="text-gray-500 text-xs block mt-1">
+                2-3 sentences highlighting your experience and what you bring to potential employers
+            </small>
+        </div>
+ 
+
+                    {/* Experience */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <i className="bi bi-briefcase text-blue-600 text-2xl"></i>
+                                <h2 className="text-xl font-bold text-gray-900">Work Experience</h2>
+                            </div>
+                            <button
+                                onClick={() => addItem('experiences', {
+                                    company: '', position: '', startDate: '', endDate: '',
+                                    duration: '', location: '', description: ''
+                                })}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            >
+                                <i className="bi bi-plus-circle me-2"></i>Add Experience
+                            </button>
+                        </div>
+
+                        {formData.experiences.length === 0 ? (
+                            <p className="text-gray-500 text-center py-8">
+                                No work experience added yet. Click "Add Experience" to get started.
+                            </p>
+                        ) : (
+                            formData.experiences.map((exp, idx) => (
+                                <div key={idx} className="border-2 border-gray-200 rounded-lg p-4 mb-4">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h3 className="text-lg font-semibold">Experience {idx + 1}</h3>
+                                        <button
+                                            onClick={() => removeItem('experiences', idx)}
+                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="col-span-2">
+                                            <input type="text" value={exp.company}
+                                                onChange={(e) => handleNestedChange('experiences', idx, 'company', e.target.value)}
+                                                placeholder="Company Name"
+                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <input type="text" value={exp.position}
+                                                onChange={(e) => handleNestedChange('experiences', idx, 'position', e.target.value)}
+                                                placeholder="Position/Job Title"
+                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                        <input type="text" value={exp.startDate}
+                                            onChange={(e) => handleNestedChange('experiences', idx, 'startDate', e.target.value)}
+                                            placeholder="Start Date (e.g., June 2021)"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={exp.endDate}
+                                            onChange={(e) => handleNestedChange('experiences', idx, 'endDate', e.target.value)}
+                                            placeholder="End Date (or 'Present')"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={exp.duration}
+                                            onChange={(e) => handleNestedChange('experiences', idx, 'duration', e.target.value)}
+                                            placeholder="Duration (e.g., 1 year 2 months)"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={exp.location}
+                                            onChange={(e) => handleNestedChange('experiences', idx, 'location', e.target.value)}
+                                            placeholder="Location"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <div className="col-span-2">
+                                            <textarea value={exp.description}
+                                                onChange={(e) => handleNestedChange('experiences', idx, 'description', e.target.value)}
+                                                placeholder="Job description"
+                                                rows="3"
+                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Education - Similar structure */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <i className="bi bi-mortarboard text-blue-600 text-2xl"></i>
+                                <h2 className="text-xl font-bold text-gray-900">Education</h2>
+                            </div>
+                            <button
+                                onClick={() => addItem('education', {
+                                    institution: '', degree: '', field: '', graduationDate: '', location: ''
+                                })}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            >
+                                <i className="bi bi-plus-circle me-2"></i>Add Education
+                            </button>
+                        </div>
+
+                        {formData.education.length === 0 ? (
+                            <p className="text-gray-500 text-center py-8">
+                                No education added yet.
+                            </p>
+                        ) : (
+                            formData.education.map((edu, idx) => (
+                                <div key={idx} className="border-2 border-gray-200 rounded-lg p-4 mb-4">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h3 className="text-lg font-semibold">Education {idx + 1}</h3>
+                                        <button onClick={() => removeItem('education', idx)}
+                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="col-span-2">
+                                            <input type="text" value={edu.institution}
+                                                onChange={(e) => handleNestedChange('education', idx, 'institution', e.target.value)}
+                                                placeholder="Institution Name"
+                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                        <input type="text" value={edu.degree}
+                                            onChange={(e) => handleNestedChange('education', idx, 'degree', e.target.value)}
+                                            placeholder="Degree"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={edu.field}
+                                            onChange={(e) => handleNestedChange('education', idx, 'field', e.target.value)}
+                                            placeholder="Field of Study"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={edu.graduationDate}
+                                            onChange={(e) => handleNestedChange('education', idx, 'graduationDate', e.target.value)}
+                                            placeholder="Graduation Date"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={edu.location}
+                                            onChange={(e) => handleNestedChange('education', idx, 'location', e.target.value)}
+                                            placeholder="Location"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Certifications */}
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2">
+                                <i className="bi bi-award text-blue-600 text-2xl"></i>
+                                <h2 className="text-xl font-bold text-gray-900">Certifications (Optional)</h2>
+                            </div>
+                            <button
+                                onClick={() => addItem('certifications', { name: '', issuer: '', date: '' })}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                            >
+                                <i className="bi bi-plus-circle me-2"></i>Add Certification
+                            </button>
+                        </div>
+
+                        {formData.certifications.length === 0 ? (
+                            <p className="text-gray-500 text-center py-8">No certifications added.</p>
+                        ) : (
+                            formData.certifications.map((cert, idx) => (
+                                <div key={idx} className="border-2 border-gray-200 rounded-lg p-4 mb-4">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h3 className="text-lg font-semibold">Certification {idx + 1}</h3>
+                                        <button onClick={() => removeItem('certifications', idx)}
+                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="col-span-2">
+                                            <input type="text" value={cert.name}
+                                                onChange={(e) => handleNestedChange('certifications', idx, 'name', e.target.value)}
+                                                placeholder="Certification Name"
+                                                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                            />
+                                        </div>
+                                        <input type="text" value={cert.issuer}
+                                            onChange={(e) => handleNestedChange('certifications', idx, 'issuer', e.target.value)}
+                                            placeholder="Issuing Organization"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <input type="text" value={cert.date}
+                                            onChange={(e) => handleNestedChange('certifications', idx, 'date', e.target.value)}
+                                            placeholder="Date Issued"
+                                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+
+                    {/* Additional Information */}
+<div className="bg-white rounded-lg shadow-md p-6">
+    <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+            <i className="bi bi-star text-blue-600 text-2xl"></i>
+            <h2 className="text-xl font-bold text-gray-900">Additional Information</h2>
+        </div>
+        <button
+            onClick={() => addItem('additionalSections', { title: '', content: '' })}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+            <i className="bi bi-plus-circle me-2"></i>Add Section
+        </button>
+    </div>
+
+    <p className="text-gray-600 text-sm mb-4">
+        Add custom sections like Awards & Honors, Publications, Projects, Volunteer Work, etc.
+    </p>
+
+    {formData.additionalSections.length === 0 ? (
+        <p className="text-gray-500 text-center py-8">
+            No additional sections added. Click "Add Section" to add honors, awards, publications, or other information.
+        </p>
+    ) : (
+        formData.additionalSections.map((section, idx) => (
+            <div key={idx} className="border-2 border-gray-200 rounded-lg p-4 mb-4">
+                <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-lg font-semibold">Section {idx + 1}</h3>
+                    <button
+                        onClick={() => removeItem('additionalSections', idx)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                        <i className="bi bi-trash"></i>
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Section Title <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            value={section.title}
+                            onChange={(e) => handleNestedChange('additionalSections', idx, 'title', e.target.value)}
+                            placeholder="e.g., Awards & Honors, Publications, Volunteer Work, Projects"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                            Content <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                            value={section.content}
+                            onChange={(e) => handleNestedChange('additionalSections', idx, 'content', e.target.value)}
+                            placeholder="Enter your content here. Use line breaks for bullet points or multiple items."
+                            rows="4"
+                            className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none resize-y"
+                        />
+                        <small className="text-gray-500 text-xs block mt-1">
+                            Tip: Start lines with "-" or "*" for bullet points (e.g., "- Award Name - Year")
+                        </small>
+                    </div>
+                </div>
+            </div>
+        ))
+    )}
+</div>
+                </div>
+            );
+        };
+
+        // Corrected ResumePreview that matches Shreya's resume design
+
+// Helper function to render multiline text with bullet points
+const renderDescriptionWithLineBreaks = (text) => {
+    if (!text) return null;
+    
+    // Split by newlines
+    const lines = text.split('\n').filter(line => line.trim());
+    
+    return (
+        <div style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+            {lines.map((line, idx) => {
+                const trimmed = line.trim();
+                // Check if line starts with dash, asterisk, or bullet
+                const isBullet = /^[-*•]\s/.test(trimmed);
+                const bulletText = isBullet ? trimmed.substring(2) : trimmed;
+                
+                return (
+                    <div key={idx} style={{ marginBottom: '0.3rem', display: 'flex', gap: '0.4rem' }}>
+                        {isBullet && <span style={{ flexShrink: 0 }}>•</span>}
+                        <span>{bulletText}</span>
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
+
+const ResumePreview = ({ formData }) => {
+    const hasExp = formData.experiences.some(e => e.company?.trim());
+    const hasEdu = formData.education.some(e => e.institution?.trim());
+    const hasCert = formData.certifications.some(c => c.name?.trim());
+    const hasSkills = formData.topSkills.some(s => s?.trim());
+    const hasLang = formData.languages.some(l => l.language?.trim());
+    const hasSummary = formData.summary?.trim();
+
+    return (
+        <div className="bg-white shadow-2xl mx-auto" style={{ maxWidth: '8.5in', minHeight: '11in', padding: '0.75in', fontFamily: 'Calibri, Arial, sans-serif' }}>
+            {/* HEADER SECTION */}
+            <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '3px solid #333' }}>
+                <h1 style={{ fontSize: '36px', fontWeight: '700', margin: '0 0 0.5rem 0', color: '#1f2937' }}>
+                    {formData.fullName || 'Your Name'}
+                </h1>
+                <p style={{ fontSize: '16px', margin: '0.3rem 0', color: '#4b5563', fontWeight: '500' }}>
+                    {formData.professionalTitle || 'Professional Title'}
+                </p>
+                {formData.location && (
+                    <p style={{ fontSize: '14px', margin: '0.3rem 0', color: '#6b7280' }}>
+                        {formData.location}
+                    </p>
+                )}
+            </div>
+
+            {/* TWO COLUMN LAYOUT */}
+            <div style={{ display: 'grid', gridTemplateColumns: '35% 65%', gap: '1.5rem' }}>
+                
+                {/* LEFT SIDEBAR */}
+                <div style={{ fontSize: '13px', lineHeight: '1.7' }}>
+                    
+                    {/* CONTACT SECTION */}
+                    {(formData.email || formData.phone || formData.linkedin || formData.portfolio) && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.7rem', color: '#1f2937', letterSpacing: '0.5px', borderBottom: '2px solid #e5e7eb', paddingBottom: '0.3rem' }}>
+                                Contact
+                            </h3>
+                            <div style={{ fontSize: '11px', lineHeight: '1.7', color: '#4b5563' }}>
+                                {formData.email && (
+                                    <div style={{ marginBottom: '0.5rem' }}>
+                                        <strong>Email:</strong><br />
+                                        <span style={{ wordBreak: 'break-word' }}>{formData.email}</span>
+                                    </div>
+                                )}
+                                {formData.phone && (
+                                    <div style={{ marginBottom: '0.5rem' }}>
+                                        <strong>Phone:</strong><br />
+                                        {formData.phone}
+                                    </div>
+                                )}
+                                {formData.linkedin && (
+                                    <div style={{ marginBottom: '0.5rem', wordBreak: 'break-word' }}>
+                                        <strong>LinkedIn:</strong><br />
+                                        {formData.linkedin}
+                                    </div>
+                                )}
+                                {formData.portfolio && (
+                                    <div style={{ marginBottom: '0.5rem', wordBreak: 'break-word' }}>
+                                        <strong>Portfolio:</strong><br />
+                                        {formData.portfolio}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* TOP SKILLS SECTION */}
+                    {hasSkills && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.7rem', color: '#1f2937', letterSpacing: '0.5px', borderBottom: '2px solid #e5e7eb', paddingBottom: '0.3rem' }}>
+                                Top Skills
+                            </h3>
+                            <div style={{ fontSize: '11px', lineHeight: '1.8', color: '#4b5563' }}>
+                                {formData.topSkills.filter(s => s?.trim()).map((skill, i) => (
+                                    <div key={i} style={{ marginBottom: '0.3rem' }}>• {skill}</div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* LANGUAGES SECTION */}
+                    {hasLang && (
+                        <div style={{ marginBottom: '1.5rem' }}>
+                            <h3 style={{ fontSize: '13px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.7rem', color: '#1f2937', letterSpacing: '0.5px', borderBottom: '2px solid #e5e7eb', paddingBottom: '0.3rem' }}>
+                                Languages
+                            </h3>
+                            <div style={{ fontSize: '11px', lineHeight: '1.7', color: '#4b5563' }}>
+                                {formData.languages.filter(l => l.language?.trim()).map((lang, i) => (
+                                    <div key={i} style={{ marginBottom: '0.4rem' }}>
+                                        <strong>{lang.language}</strong>
+                                        {lang.proficiency && <span> ({lang.proficiency})</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* RIGHT COLUMN - MAIN CONTENT */}
+                <div>
+                    
+                    {/* PROFESSIONAL SUMMARY SECTION */}
+                    {hasSummary && (
+                        <div style={{ marginBottom: '1.8rem' }}>
+                            <h2 style={{ fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.8rem', paddingBottom: '0.5rem', borderBottom: '3px solid #333', color: '#1f2937', letterSpacing: '0.5px' }}>
+                                Professional Summary
+                            </h2>
+                            <div style={{ fontSize: '12px', lineHeight: '1.7', color: '#4b5563', margin: 0, whiteSpace: 'pre-wrap', wordWrap: 'break-word' }}>
+                                {formData.summary}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* EXPERIENCE SECTION */}
+                    {hasExp && (
+                        <div style={{ marginBottom: '1.8rem' }}>
+                            <h2 style={{ fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.8rem', paddingBottom: '0.5rem', borderBottom: '3px solid #333', color: '#1f2937', letterSpacing: '0.5px' }}>
+                                Experience
+                            </h2>
+                            <div>
+                                {formData.experiences.filter(e => e.company?.trim()).map((exp, i) => (
+                                    <div key={i} style={{ marginBottom: '1.2rem' }}>
+                                        <h4 style={{ fontSize: '13px', fontWeight: '700', margin: '0 0 0.3rem 0', color: '#1f2937' }}>
+                                            {exp.company}
+                                        </h4>
+                                        {exp.position && (
+                                            <p style={{ fontSize: '12px', fontStyle: 'italic', margin: '0.2rem 0', color: '#4b5563' }}>
+                                                {exp.position}
+                                            </p>
+                                        )}
+                                        {(exp.startDate || exp.endDate) && (
+                                            <p style={{ fontSize: '11px', margin: '0.2rem 0', color: '#6b7280' }}>
+                                                {exp.startDate && exp.startDate}
+                                                {exp.startDate && exp.endDate && ' - '}
+                                                {exp.endDate && exp.endDate}
+                                                {exp.duration && ` (${exp.duration})`}
+                                            </p>
+                                        )}
+                                        {exp.location && (
+                                            <p style={{ fontSize: '11px', margin: '0.2rem 0', color: '#6b7280' }}>
+                                                {exp.location}
+                                            </p>
+                                        )}
+                                        {exp.description && (
+                                            <div style={{ fontSize: '11px', margin: '0.5rem 0 0 0', color: '#4b5563', lineHeight: '1.6' }}>
+                                                {renderDescriptionWithLineBreaks(exp.description)}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* EDUCATION SECTION */}
+                    {hasEdu && (
+                        <div style={{ marginBottom: '1.8rem' }}>
+                            <h2 style={{ fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.8rem', paddingBottom: '0.5rem', borderBottom: '3px solid #333', color: '#1f2937', letterSpacing: '0.5px' }}>
+                                Education
+                            </h2>
+                            <div>
+                                {formData.education.filter(e => e.institution?.trim()).map((edu, i) => (
+                                    <div key={i} style={{ marginBottom: '1.2rem' }}>
+                                        <h4 style={{ fontSize: '13px', fontWeight: '700', margin: '0 0 0.3rem 0', color: '#1f2937' }}>
+                                            {edu.institution}
+                                        </h4>
+                                        {(edu.degree || edu.field) && (
+                                            <p style={{ fontSize: '12px', margin: '0.2rem 0', color: '#4b5563' }}>
+                                                {edu.degree}
+                                                {edu.degree && edu.field && ' - '}
+                                                {edu.field}
+                                            </p>
+                                        )}
+                                        {edu.graduationDate && (
+                                            <p style={{ fontSize: '11px', margin: '0.2rem 0', color: '#6b7280' }}>
+                                                {edu.graduationDate}
+                                            </p>
+                                        )}
+                                        {edu.location && (
+                                            <p style={{ fontSize: '11px', margin: '0.2rem 0', color: '#6b7280' }}>
+                                                {edu.location}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* CERTIFICATIONS SECTION */}
+                    {hasCert && (
+                        <div>
+                            <h2 style={{ fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.8rem', paddingBottom: '0.5rem', borderBottom: '3px solid #333', color: '#1f2937', letterSpacing: '0.5px' }}>
+                                Certifications
+                            </h2>
+                            <div>
+                                {formData.certifications.filter(c => c.name?.trim()).map((cert, i) => (
+                                    <div key={i} style={{ marginBottom: '1rem' }}>
+                                        <h4 style={{ fontSize: '13px', fontWeight: '700', margin: '0 0 0.3rem 0', color: '#1f2937' }}>
+                                            {cert.name}
+                                        </h4>
+                                        {cert.issuer && (
+                                            <p style={{ fontSize: '12px', margin: '0.2rem 0', color: '#4b5563' }}>
+                                                {cert.issuer}
+                                            </p>
+                                        )}
+                                        {cert.date && (
+                                            <p style={{ fontSize: '11px', margin: '0.2rem 0', color: '#6b7280' }}>
+                                                 {cert.date}
+                                            </p>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ADDITIONAL SECTIONS */}
+{formData.additionalSections.length > 0 && formData.additionalSections.some(s => s.title?.trim()) && (
+    <>
+        {formData.additionalSections.filter(s => s.title?.trim()).map((section, i) => (
+            <div key={i} style={{ marginBottom: '1.8rem' }}>
+                <h2 style={{ fontSize: '15px', fontWeight: '700', textTransform: 'uppercase', marginBottom: '0.8rem', paddingBottom: '0.5rem', borderBottom: '3px solid #333', color: '#1f2937', letterSpacing: '0.5px' }}>
+                    {section.title}
+                </h2>
+                <div style={{ fontSize: '12px', lineHeight: '1.7', color: '#4b5563' }}>
+                    {renderDescriptionWithLineBreaks(section.content)}
+                </div>
+            </div>
+        ))}
+    </>
+)}
+                </div>
+            </div>
+        </div>
+    );
+};
+        
+
+        ReactDOM.render(<ResumeBuilder />, document.getElementById('resume-builder-root'));
+    </script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,137 @@
+
+/*
+body.white-page {
+    background: linear-gradient(135deg, #ffffff 0%, #e0c5ff 100%);
+    color: #000000; /* White text for better contrast on the blue-purple gradient 
+    min-height: 100vh; /* Ensures full viewport height coverage 
+}*/
+
+
+
+    .logo {
+font-family: 'Montserrat', sans-serif;
+font-weight: 700;
+font-size: 1.75rem;
+color: #e1e4e8;
+display: flex;
+align-items: center;
+gap: 0.15rem;
+margin-right: auto;
+
+}
+
+.logo .h-box {
+display: flex;
+gap: 0.15rem;
+letter-spacing: -0.05em;
+margin-left: auto;
+
+
+}
+.logo .h-box span {
+font-weight: 900;
+font-size: 1.9rem;
+}
+.logo .logo-text {
+letter-spacing: -0.1em;
+}
+
+
+
+
+
+
+/* Reset & base */
+* {
+margin: 0;
+padding: 0;
+/*box-sizing: border-box;*/
+}
+
+
+nav {
+background-color: #2a366b;
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 1rem 3rem;
+box-shadow: inset 0 -2px 4px rgb(255 255 255 / 0.1);
+	font-family: 'Orbitron', sans-serif;
+  height: 100px;
+  z-index: 1040; overflow: visible;
+  color: #ffffff;
+}
+
+
+Navigation Bar */
+
+.nav-links a[aria-current="page"] {
+  border-bottom: 2px solid #ffffff;
+  text-decoration: none;
+}
+
+/*body::before, body::after { z-index: 1030 !important; }
+
+
+/* Sidebar offcanvas styling */
+.offcanvas {
+  position: fixed; /* lock it on the left */
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0; /* collapsed by default */
+  
+ 
+  color: #e1e4e8;
+  transition: width 0.3s ease-in-out; /* smooth expand */
+  z-index: 9999; /* stay above content */
+}
+/*
+.offcanvas.show {
+  width: 250px; /* fully visible sidebar 
+}
+  */
+
+/* Main content shifts right when sidebar opens */
+.main-content {
+  transition: margin-left 0.3s ease-in-out;
+  margin-left: 0; /* default */
+}
+
+.offcanvas.show ~ .main-content {
+  margin-left: auto; /* shift when sidebar is open */
+}
+
+/* Header of sidebar 
+.offcanvas-header {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}*/
+
+/* Sidebar links 
+  padding-top: 1rem;
+}*/
+
+.offcanvas-body .nav-link {
+  font-size: 1.1rem;
+  color: #e1e4e8;
+  padding: 0.5rem 1rem;
+  font-family: 'Open Sans', sans-serif;
+  display: block;
+  transition: background 0.3s ease, padding-left 0.3s ease;
+}
+
+.offcanvas-body .nav-link:hover {
+  background-color: #1e2a53;
+  padding-left: 1.5rem;
+  color: #ffffff;
+  border-left: 4px solid #f08c7b;
+  text-decoration: none;
+}
+
+/* Active link 
+.offcanvas-body .nav-link.active {
+  background-color: #1e2a53;
+  border-left: 4px solid #e25822;
+}
+*/

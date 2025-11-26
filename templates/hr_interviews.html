@@ -1,0 +1,1148 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Management{% endblock %}
+
+{% block Addnav %}
+<!--<li class="nav-item active">
+  <a class="nav-links" role="menuitem" href="/HR1/interviews">Interviews</a>
+</li>-->
+{% endblock %}
+
+{% block content %}
+<style>
+.hr-interview-dashboard {
+  padding: 2rem;
+ background: #fafafa;
+  border-top: 4px solid #8bb7ff; 
+  min-height: 100vh;
+}
+
+.dashboard-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.filters-section {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.interviews-section {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.interview-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.interview-table th,
+.interview-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.interview-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #374151;
+}
+
+.interview-table tr:hover {
+  background: #f8fafc;
+}
+
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.candidate-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.candidate-details h6 {
+  margin-bottom: 0.25rem;
+  color: #1f2937;
+}
+
+.candidate-email {
+  color: #6b7280;
+  font-size: 0.75rem;
+}
+
+.job-badge {
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.score-high {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.score-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.score-low {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-scheduled {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-interview_pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-completed {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.interview-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-success {
+  background: #10b981;
+  color: white;
+}
+
+.btn-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-outline {
+  background: transparent;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+}
+
+.btn-action:hover {
+  transform: translateY(-1px);
+  text-decoration: none;
+  color: white;
+}
+
+.ai-badge {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.form-group {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.form-control {
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-filter {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-filter:hover {
+  background: #2563eb;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+/* FIXED MODAL Z-INDEX ISSUES */
+.modal {
+  z-index: 1060 !important;
+  padding-top: 5rem;
+}
+
+.modal-backdrop {
+  z-index: 0 !important;
+}
+
+.modal-dialog {
+  z-index: 1070 !important;
+}
+
+@media (max-width: 768px) {
+  .hr-interview-dashboard {
+    padding: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .interview-table {
+    font-size: 0.875rem;
+  }
+  
+  .interview-table th,
+  .interview-table td {
+    padding: 0.5rem;
+  }
+  
+  .filter-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+<div class="hr-interview-dashboard">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-4">
+      <div>
+        <h1 class="h2 mb-2">Interview Management</h1>
+        <p class="mb-0 opacity-90">Schedule, track, and manage candidate interviews</p>
+      </div>
+      <div class="text-end">
+        <div class="small opacity-75">{{ current_date.strftime('%B %d, %Y') if current_date else '' }}</div>
+        <div class="h4 mb-0">{{ current_date.strftime('%I:%M %p') if current_date else '' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.total_interviews or 0 }}</div>
+      <div class="stat-label">Total Interviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.pending_schedule or 0 }}</div>
+      <div class="stat-label">Pending Schedule</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ stats.today_interviews or 0 }}</div>
+      <div class="stat-label">Today's Interviews</div>
+    </div>
+    <!-- <div class="stat-card">
+      <div class="stat-number">{{ stats.pending_feedback or 0 }}</div>
+      <div class="stat-label">Pending Feedback</div>
+    </div> -->
+  </div>
+
+<!-- <div class="alert alert-warning mt-3">
+  <strong>DEBUG INFO:</strong><br>
+  Total interviews found: {{ interviews|length }}<br>
+  Filters applied: Job ID = {{ filters.job_id or 'None' }}, Status = {{ filters.status or 'all' }}<br>
+  Available jobs: {{ jobs|length }}<br>
+  {% if interviews %}
+    <strong>Interview details:</strong><br>
+    {% for interview in interviews %}
+    - {{ interview.candidate_name }} ({{ interview.status }}) for {{ interview.job_title }}<br>
+    {% endfor %}
+  {% else %}
+    <span class="text-danger">No interviews found with current query</span>
+  {% endif %}
+</div> -->
+
+
+  <!-- Filters -->
+  <div class="filters-section">
+  <h5 class="mb-3">Filter Interviews</h5>
+  <form method="GET" action="/HR1/interviews">
+    <div class="filter-row">
+      <div class="form-group">
+        <label class="form-label">Job Position</label>
+        <select name="job_id" class="form-control">
+          <option value="">All Jobs</option>
+          {% for job in jobs %}
+          <option value="{{ job._id }}" {% if filters and filters.job_id == job._id|string %}selected{% endif %}>
+            {{ job.Job_Profile }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-control">
+          <option value="all" {% if not filters or filters.status == 'all' %}selected{% endif %}>All Status</option>
+          <option value="interview_pending" {% if filters and filters.status == 'interview_pending' %}selected{% endif %}>Pending Schedule</option>
+          <option value="shortlisted" {% if filters and filters.status == 'shortlisted' %}selected{% endif %}>Shortlisted</option>
+          <option value="interview_scheduled" {% if filters and filters.status == 'interview_scheduled' %}selected{% endif %}>Scheduled</option>
+          <option value="interviewed" {% if filters and filters.status == 'interviewed' %}selected{% endif %}>Completed</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Date Range</label>
+        <select name="date_range" class="form-control">
+          <option value="all" {% if not filters or filters.date_range == 'all' %}selected{% endif %}>All Dates</option>
+          <option value="today" {% if filters and filters.date_range == 'today' %}selected{% endif %}>Today</option>
+          <option value="week" {% if filters and filters.date_range == 'week' %}selected{% endif %}>This Week</option>
+          <option value="month" {% if filters and filters.date_range == 'month' %}selected{% endif %}>This Month</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <button type="submit" class="btn-filter">Apply Filters</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+  <!-- Interviews List -->
+  <div class="interviews-section">
+    <div class="section-header">
+      <h5 class="mb-0">Interview Schedule</h5>
+    </div>
+    
+    {% if interviews %}
+    <div class="table-responsive">
+      <table class="interview-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Job Position</th>
+            <th></th>
+            <th>Interview Details</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for interview in interviews %}
+          <tr>
+            <td>
+              <div class="candidate-info">
+                <div class="candidate-avatar">
+                  {{ (interview.candidate_name or 'U')[0]|upper }}
+                </div>
+                <div class="candidate-details">
+                  <h6 class="mb-0">{{ interview.candidate_name }}</h6>
+                  <div class="candidate-email">{{ interview.candidate_email }}</div>
+                </div>
+              </div>
+            </td>
+            
+            <td>
+              <span class="job-badge">{{ interview.job_title }}</span>
+            </td>
+            
+            <td>
+              <div class="d-flex flex-column gap-1">
+               <!-- <span class="score-badge score-{% if interview.match_score >= 80 %}high{% elif interview.match_score >= 60 %}medium{% else %}low{% endif %}">
+                  Match: {{ interview.match_score }}%
+                </span> -->
+                {% if interview.hiring_likelihood %}
+                <!--<span class="score-badge score-high">
+                  Hiring: {{ interview.hiring_likelihood }}%
+                </span>-->
+                {% endif %}
+                {% if interview.ai_enhanced %}
+               <!-- <span class="ai-badge">AI</span>-->
+                {% endif %}
+              </div>
+            </td>
+            
+            <td>
+              {% if interview.interview_date %}
+              <div class="small">
+                <strong>Date:</strong> {{ interview.interview_date.strftime('%b %d, %Y') }}<br>
+                {% if interview.interview_time %}
+                <strong>Time:</strong> {{ interview.interview_time }}<br>
+                {% endif %}
+                {% if interview.interview_type %}
+                <strong>Type:</strong> {{ interview.interview_type }}
+                {% endif %}
+              </div>
+              {% else %}
+              <span class="text-muted">Not scheduled</span>
+              {% endif %}
+            </td>
+            
+            <td>
+  <span class="status-badge 
+    {% if interview.status == 'interview_scheduled' %}status-scheduled
+    {% elif interview.status == 'interviewed' %}status-completed
+    {% elif interview.status == 'interview_pending' %}status-interview_pending
+    {% elif interview.status == 'shortlisted' %}status-pending
+    {% else %}status-pending
+    {% endif %}">
+    {% if interview.status == 'interview_scheduled' %}Scheduled
+    {% elif interview.status == 'interviewed' %}Completed
+    {% elif interview.status == 'interview_pending' %}Pending Schedule
+    {% elif interview.status == 'shortlisted' %}Shortlisted
+    {% else %}{{ interview.status|title|replace('_', ' ') }}
+    {% endif %}
+  </span>
+</td>
+            <td>
+  <div class="interview-actions">
+    {% if interview.status in ['interview_pending', 'shortlisted'] %}
+    <button onclick="scheduleInterview('{{ interview.application_id }}')" class="btn-action btn-primary" title="Schedule Interview">
+      📅 Schedule
+    </button>
+    {% elif interview.status == 'interview_scheduled' %}
+    <button onclick="editInterview('{{ interview.application_id }}')" class="btn-action btn-warning" title="Edit Interview">
+      ✏️ Edit
+    </button>
+    {% if not interview.feedback_submitted %}
+    <button onclick="submitFeedback('{{ interview.application_id }}')" class="btn-action btn-success" title="Submit Feedback">
+      📝 Feedback
+    </button>
+    {% endif %}
+    {% elif interview.status == 'interviewed' and not interview.feedback_submitted %}
+    <button onclick="submitFeedback('{{ interview.application_id }}')" class="btn-action btn-success" title="Submit Feedback">
+      📝 Feedback
+    </button>
+    {% endif %}
+<!--     
+    <button onclick="viewCandidate('{{ interview.candidate_id }}')" class="btn-action btn-outline" title="View Candidate">
+      👤
+    </button> -->
+
+
+    <button onclick="viewInterviewDetails('{{ interview.application_id }}')" class="btn-action btn-outline" title="View Details">
+      📋
+    </button>
+  </div>
+</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <p class="mb-2">No interviews found</p>
+      <p class="mb-0 small text-muted">Check your filters or shortlist candidates from applications</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Schedule Interview Modal -->
+<div class="modal fade" id="scheduleInterviewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Schedule Interview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="scheduleInterviewForm">
+        <div class="modal-body">
+          <input type="hidden" id="scheduleApplicationId" name="application_id">
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Date</label>
+              <input type="date" class="form-control" id="interviewDate" name="interview_date" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Time</label>
+              <input type="time" class="form-control" id="interviewTime" name="interview_time" required>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Type</label>
+              <select class="form-control" name="interview_type" required>
+                <option value="Panel Interview">Panel Interview</option>
+                <option value="Technical Interview">Technical Interview</option>
+                <option value="HR Interview">HR Interview</option>
+                <option value="Video Interview">Video Interview</option>
+                <option value="Phone Interview">Phone Interview</option>
+                <option value="Final Interview">Final Interview</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Location/Platform</label>
+              <input type="text" class="form-control" name="interview_location" placeholder="e.g., Conference Room A or Zoom">
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interviewer Name</label>
+              <input type="text" class="form-control" name="interviewer_name" placeholder="Primary interviewer name">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interviewer Email</label>
+              <input type="email" class="form-control" name="interviewer_email" placeholder="interviewer@company.com">
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Meeting Link (if virtual)</label>
+            <input type="url" class="form-control" name="meeting_link" placeholder="https://zoom.us/j/...">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Additional Notes</label>
+            <textarea class="form-control" name="notes" rows="3" placeholder="Any additional information for the candidate..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Schedule Interview</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Interview Modal -->
+<div class="modal fade" id="editInterviewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Interview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="editInterviewForm">
+        <div class="modal-body">
+          <input type="hidden" id="editApplicationId" name="application_id">
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Date</label>
+              <input type="date" class="form-control" id="editInterviewDate" name="interview_date" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Time</label>
+              <input type="time" class="form-control" id="editInterviewTime" name="interview_time" required>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interview Type</label>
+              <select class="form-control" id="editInterviewType" name="interview_type" required>
+                <option value="Panel Interview">Panel Interview</option>
+                <option value="Technical Interview">Technical Interview</option>
+                <option value="HR Interview">HR Interview</option>
+                <option value="Video Interview">Video Interview</option>
+                <option value="Phone Interview">Phone Interview</option>
+                <option value="Final Interview">Final Interview</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Location/Platform</label>
+              <input type="text" class="form-control" id="editInterviewLocation" name="interview_location">
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interviewer Name</label>
+              <input type="text" class="form-control" id="editInterviewerName" name="interviewer_name">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Interviewer Email</label>
+              <input type="email" class="form-control" id="editInterviewerEmail" name="interviewer_email">
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Meeting Link</label>
+            <input type="url" class="form-control" id="editMeetingLink" name="meeting_link">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select class="form-control" id="editStatus" name="status">
+              <option value="interview_scheduled">Scheduled</option>
+              <option value="interviewed">Completed</option>
+              <option value="interview_pending">Pending</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" id="editNotes" name="interview_notes" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Interview</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Interview Feedback Modal -->
+<div class="modal fade" id="feedbackModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Submit Interview Feedback</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form id="feedbackForm">
+        <div class="modal-body">
+          <input type="hidden" id="feedbackApplicationId" name="application_id">
+          
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Overall Rating</label>
+              <select class="form-control" name="overall_rating" required>
+                <option value="">Select rating</option>
+                <option value="5">Excellent (5/5)</option>
+                <option value="4">Good (4/5)</option>
+                <option value="3">Average (3/5)</option>
+                <option value="2">Below Average (2/5)</option>
+                <option value="1">Poor (1/5)</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Recommendation</label>
+              <select class="form-control" name="recommendation" required>
+                <option value="">Select recommendation</option>
+                <option value="strongly_recommend">Strongly Recommend</option>
+                <option value="recommend">Recommend</option>
+                <option value="neutral">Neutral</option>
+                <option value="not_recommend">Do Not Recommend</option>
+                <option value="strongly_not_recommend">Strongly Do Not Recommend</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Technical Skills</label>
+              <select class="form-control" name="technical_skills">
+                <option value="">N/A</option>
+                <option value="5">Excellent</option>
+                <option value="4">Good</option>
+                <option value="3">Average</option>
+                <option value="2">Below Average</option>
+                <option value="1">Poor</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Communication</label>
+              <select class="form-control" name="communication">
+                <option value="">N/A</option>
+                <option value="5">Excellent</option>
+                <option value="4">Good</option>
+                <option value="3">Average</option>
+                <option value="2">Below Average</option>
+                <option value="1">Poor</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Cultural Fit</label>
+              <select class="form-control" name="cultural_fit">
+                <option value="">N/A</option>
+                <option value="5">Excellent</option>
+                <option value="4">Good</option>
+                <option value="3">Average</option>
+                <option value="2">Below Average</option>
+                <option value="1">Poor</option>
+              </select>
+            </div>
+            <div class="col-md-3 mb-3">
+              <label class="form-label">Experience Relevance</label>
+              <select class="form-control" name="experience_relevance">
+                <option value="">N/A</option>
+                <option value="5">Excellent</option>
+                <option value="4">Good</option>
+                <option value="3">Average</option>
+                <option value="2">Below Average</option>
+                <option value="1">Poor</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Strengths</label>
+            <textarea class="form-control" name="strengths" rows="2" placeholder="What are the candidate's key strengths?"></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Areas for Improvement</label>
+            <textarea class="form-control" name="areas_for_improvement" rows="2" placeholder="What areas could the candidate improve?"></textarea>
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Additional Notes</label>
+            <textarea class="form-control" name="additional_notes" rows="3" placeholder="Any additional comments or observations..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Interview Details Modal -->
+<div class="modal fade" id="interviewDetailsModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Interview Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="interviewDetailsContent">
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+          <div class="mt-2">Loading interview details...</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+
+
+// Interview management functions
+function scheduleNewInterview() {
+  // This would open a modal to select a candidate from pending applications
+  alert('Feature to select candidate from pending applications will be implemented');
+}
+
+function scheduleInterview(applicationId) {
+  document.getElementById('scheduleApplicationId').value = applicationId;
+  
+  // Set minimum date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('interviewDate').min = today;
+  
+  const modal = new bootstrap.Modal(document.getElementById('scheduleInterviewModal'));
+  modal.show();
+}
+
+function editInterview(applicationId) {
+  // Load current interview data
+  fetch(`/get_interview_details/${applicationId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert('Error loading interview details: ' + data.error);
+        return;
+      }
+      
+      // Populate form
+      document.getElementById('editApplicationId').value = applicationId;
+      
+      if (data.interview_date) {
+        const date = new Date(data.interview_date);
+        document.getElementById('editInterviewDate').value = date.toISOString().split('T')[0];
+      }
+      
+      document.getElementById('editInterviewTime').value = data.interview_time || '';
+      document.getElementById('editInterviewType').value = data.interview_type || '';
+      document.getElementById('editInterviewLocation').value = data.interview_location || '';
+      document.getElementById('editInterviewerName').value = data.interviewer_name || '';
+      document.getElementById('editInterviewerEmail').value = data.interviewer_email || '';
+      document.getElementById('editMeetingLink').value = data.meeting_link || '';
+      document.getElementById('editStatus').value = data.status || '';
+      document.getElementById('editNotes').value = data.notes || '';
+      
+      const modal = new bootstrap.Modal(document.getElementById('editInterviewModal'));
+      modal.show();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Failed to load interview details');
+    });
+}
+
+function submitFeedback(applicationId) {
+  document.getElementById('feedbackApplicationId').value = applicationId;
+  const modal = new bootstrap.Modal(document.getElementById('feedbackModal'));
+  modal.show();
+}
+
+function viewCandidate(candidateId) {
+  // Redirect to candidate details page
+  window.open(`/candidate_details/${candidateId}`, '_blank');
+}
+
+function viewInterviewDetails(applicationId) {
+  const modal = new bootstrap.Modal(document.getElementById('interviewDetailsModal'));
+  const content = document.getElementById('interviewDetailsContent');
+  
+  // Show loading state
+  content.innerHTML = `
+    <div class="text-center py-4">
+      <div class="spinner-border text-primary" role="status"></div>
+      <div class="mt-2">Loading interview details...</div>
+    </div>
+  `;
+  
+  modal.show();
+  
+  // Fetch interview details
+  fetch(`/get_interview_details/${applicationId}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        content.innerHTML = `
+          <div class="alert alert-danger">
+            <strong>Error:</strong> ${data.error}
+          </div>
+        `;
+        return;
+      }
+      
+      // Format interview details
+      let detailsHtml = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6 class="text-primary">Candidate Information</h6>
+            <p><strong>Name:</strong> ${data.candidate_name}</p>
+            <p><strong>Email:</strong> <a href="mailto:${data.candidate_email}">${data.candidate_email}</a></p>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-primary">Job Information</h6>
+            <p><strong>Position:</strong> ${data.job_title}</p>
+            <p><strong>Company:</strong> ${data.company_name}</p>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <h6 class="text-primary">Interview Schedule</h6>
+      `;
+      
+      if (data.interview_date) {
+        const interviewDate = new Date(data.interview_date);
+        detailsHtml += `<p><strong>Date:</strong> ${interviewDate.toLocaleDateString()}</p>`;
+      }
+      
+      if (data.interview_time) {
+        detailsHtml += `<p><strong>Time:</strong> ${data.interview_time}</p>`;
+      }
+      
+      if (data.interview_type) {
+        detailsHtml += `<p><strong>Type:</strong> ${data.interview_type}</p>`;
+      }
+      
+      if (data.interview_location) {
+        detailsHtml += `<p><strong>Location:</strong> ${data.interview_location}</p>`;
+      }
+      
+      if (data.meeting_link) {
+        detailsHtml += `<p><strong>Meeting Link:</strong> <a href="${data.meeting_link}" target="_blank" class="text-primary">Join Meeting</a></p>`;
+      }
+      
+      detailsHtml += `</div><div class="col-md-6">`;
+      
+      if (data.interviewer_name || data.interviewer_email) {
+        detailsHtml += `<h6 class="text-primary">Interviewer</h6>`;
+        if (data.interviewer_name) {
+          detailsHtml += `<p><strong>Name:</strong> ${data.interviewer_name}</p>`;
+        }
+        if (data.interviewer_email) {
+          detailsHtml += `<p><strong>Email:</strong> <a href="mailto:${data.interviewer_email}">${data.interviewer_email}</a></p>`;
+        }
+      }
+      
+      detailsHtml += `</div></div>`;
+      
+      if (data.notes) {
+        detailsHtml += `
+          <div class="mt-3">
+            <h6 class="text-primary">Notes</h6>
+            <p>${data.notes}</p>
+          </div>
+        `;
+      }
+      
+      if (data.feedback) {
+        detailsHtml += `
+          <div class="mt-3">
+            <h6 class="text-primary">Interview Feedback</h6>
+            <div class="alert alert-info">
+              <p><strong>Overall Rating:</strong> ${data.feedback.overall_rating}/5</p>
+              <p><strong>Recommendation:</strong> ${data.feedback.recommendation}</p>
+              ${data.feedback.strengths ? `<p><strong>Strengths:</strong> ${data.feedback.strengths}</p>` : ''}
+              ${data.feedback.areas_for_improvement ? `<p><strong>Areas for Improvement:</strong> ${data.feedback.areas_for_improvement}</p>` : ''}
+            </div>
+          </div>
+        `;
+      }
+      
+      content.innerHTML = detailsHtml;
+    })
+    .catch(error => {
+      console.error('Error fetching interview details:', error);
+      content.innerHTML = `
+        <div class="alert alert-danger">
+          <strong>Error:</strong> Failed to load interview details. Please try again.
+        </div>
+      `;
+    });
+}
+
+// Form submission handlers
+document.getElementById('scheduleInterviewForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+  
+  fetch('/schedule_interview', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success) {
+      alert('Interview scheduled successfully!');
+      location.reload();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to schedule interview');
+  });
+});
+
+document.getElementById('editInterviewForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+  
+  fetch('/update_interview', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success) {
+      alert('Interview updated successfully!');
+      location.reload();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to update interview');
+  });
+});
+
+document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData.entries());
+  
+  // Structure the feedback data
+  const feedbackData = {
+    application_id: data.application_id,
+    feedback: {
+      overall_rating: data.overall_rating,
+      technical_skills: data.technical_skills,
+      communication: data.communication,
+      cultural_fit: data.cultural_fit,
+      experience_relevance: data.experience_relevance,
+      strengths: data.strengths,
+      areas_for_improvement: data.areas_for_improvement,
+      recommendation: data.recommendation,
+      additional_notes: data.additional_notes
+    }
+  };
+  
+  fetch('/submit_interview_feedback', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(feedbackData)
+  })
+  .then(response => response.json())
+  .then(result => {
+    if (result.success) {
+      alert('Feedback submitted successfully!');
+      location.reload();
+    } else {
+      alert('Error: ' + result.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Failed to submit feedback');
+  });
+});
+
+
+
+
+</script>
+
+{% endblock %}

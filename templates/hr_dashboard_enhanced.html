@@ -1,0 +1,766 @@
+<!--hr_dashboard_enhanced.html>-->
+{% extends "base.html" %}
+{% block body_class %}hr-dashboard{% endblock %}
+{% block title %}HR Dashboard{% endblock %}
+
+{% block Addnav %}
+<!--<li class="nav-item active">
+  <a class="nav-links" role="menuitem" href="/HR_Dashboard_Enhanced">Dashboard</a>
+</li>-->
+{% endblock %}
+
+{% block content %}
+<style>
+  
+
+
+.pipeline-fill {
+  background: #8b5cf6;
+  width: var(--progress);
+}
+
+.dashboard-container {
+  padding: 2rem;
+ background: #fafafa;
+  border-top: 4px solid #8bb7ff; 
+  min-height: 100vh;
+}
+
+.dashboard-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.stat-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-trend {
+  font-size: 0.875rem;
+  color: #10b981;
+  font-weight: 500;
+}
+
+.chart-container {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.pipeline-stage {
+  text-align: center;
+  position: relative;
+}
+
+.pipeline-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.pipeline-bar {
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.pipeline-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+  border-color: #3b82f6;
+  text-decoration: none;
+  color: inherit;
+    box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.action-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.activity-feed {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  transition: background-color 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.activity-item:hover {
+  background-color: #f8fafc;
+  border-left-color: #3b82f6;
+}
+
+.activity-icon {
+  width: 2.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1rem;
+  flex-shrink: 0;
+
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.activity-description {
+  color: #000000;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.activity-time {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+
+.ai-badge {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  font-size: 0.625rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  margin-left: 0.5rem;
+}
+
+.candidates-preview {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.candidate-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+  background: #f8fafc;
+  transition: all 0.3s ease;
+}
+
+.candidate-item:hover {
+  background: #e5f3ff;
+  transform: translateX(5px);
+}
+
+.candidate-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  margin-right: 1rem;
+}
+
+.candidate-info {
+  flex: 1;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.candidate-role {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.candidate-scores {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.score-badge {
+  background: #dcfce7;
+  color: #166534;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ai-insights {
+      background: linear-gradient(135deg, #f8fafc 0%, #ff7777 100%);
+  border-left: 10px solid #ff5f5f;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.insight-item {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  backdrop-filter: blur(5px);
+  color: #353637;
+}
+
+.insight-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.insight-description {
+  opacity: 0.9;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  
+}
+
+.insight-action {
+  background: rgba(242, 0, 0, 0.2);
+  color: rgb(43, 43, 43);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.insight-action:hover {
+  background: rgba(71, 0, 0, 0.511);
+  color: rgb(255, 255, 255);
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-actions {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-header {
+    padding: 1.5rem;
+  }
+}
+</style>
+
+<div class="dashboard-container">
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-4">
+      <div>
+        <h1 class="h2 mb-2">Welcome back, {{ session.user_name }}!</h1>
+        <p class="mb-0 opacity-90">Here's what's happening with your recruitment today</p>
+      </div>
+      <div class="text-end">
+        <div class="small opacity-75">{{ current_date.strftime('%B %d, %Y') }}</div>
+        <div class="h4 mb-0">{{ current_time.strftime('%I:%M %p') }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Statistics -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #3b82f6, #1e40af);">
+        👥
+      </div>
+      <div class="stat-number">{{ dashboard_stats.total_jobs or 0 }}</div>
+      <div class="text-muted fw-medium">Active Job Postings</div>
+      <div class="stat-trend">+{{ dashboard_stats.new_jobs_this_week or 0 }} this week</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #047857);">
+        📋
+      </div>
+      <div class="stat-number">{{ dashboard_stats.total_applications or 0 }}</div>
+      <div class="text-muted fw-medium">Total Applications</div>
+      <div class="stat-trend">+{{ dashboard_stats.new_applications_today or 0 }} today</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+        ⏱️
+      </div>
+      <div class="stat-number">{{ dashboard_stats.interviews_scheduled or 0 }}</div>
+      <div class="text-muted fw-medium">Interviews Scheduled</div>
+      <div class="stat-trend">{{ dashboard_stats.interviews_today or 0 }} today</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+        🎯
+      </div>
+      <div class="stat-number">{{ dashboard_stats.avg_match_score or 0 }}%</div>
+      <div class="text-muted fw-medium">Avg Match Score</div>
+      <!-- <div class="stat-trend">AI-enhanced matching</div> -->
+    </div>
+  </div>
+
+  <!-- AI Insights Panel 
+  {% if ai_insights %}
+  <div class="ai-insights">
+    <h3 class="h5 mb-4">🧠 AI Insights & Recommendations</h3>
+    <div class="row">
+      {% for insight in ai_insights %}
+      <div class="col-md-6 mb-3">
+        <div class="insight-item">
+          <div class="insight-title">{{ insight.title }}</div>
+          <div class="insight-description">{{ insight.description }}</div>
+          {% if insight.action %}
+          <a href="{{ insight.action_url }}" class="insight-action">
+            {{ insight.action }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}-->
+
+<!-- HR AI Insights Panel 
+<div class="ai-insights">
+    <h3 class="h5 mb-4">🧠 Hiring Pipeline Insights</h3>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <div class="insight-item">
+                <div class="insight-title">Job Selection</div>
+                <div class="insight-description mb-3">Select a job to view AI-powered pipeline predictions and hiring recommendations</div>
+                <div class="job-selector">
+                    <select id="job-select" onchange="loadHRInsights()" class="form-select" style="background: rgba(255,255,255,0.9); border: 1px solid rgba(255,255,255,0.3); border-radius: 0.5rem; padding: 0.5rem;">
+                        <option value="">Select a job to analyze...</option>
+                        {% for job in jobs %}
+                        <option value="{{ job._id }}">{{ job.Job_Profile }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div id="hr-insights-container" style="display: none;">
+                <div id="hr-insights"></div>
+            </div>
+        </div>
+    </div>
+</div>
+-->
+
+
+  <!-- Hiring Pipeline Chart -->
+  <div class="chart-container">
+    <h3 class="h5 mb-4"> Overview</h3>
+    <div class="row text-center">
+      <!--
+      <div class="col pipeline-stage">
+        <div class="pipeline-number text-primary">{{ pipeline_stats.applied or 0 }}</div>
+        <div class="small text-muted">Applied</div>
+        <div class="pipeline-bar">
+          <div class="pipeline-fill bg-primary" style="width: 100%"></div>
+        </div>
+      </div>
+      <div class="col pipeline-stage">
+        <div class="pipeline-number text-warning">{{ pipeline_stats.screening or 0 }}</div>
+        <div class="small text-muted">Screening</div>
+        <div class="pipeline-bar" 
+     style="--progress: {{ (pipeline_stats.offer / (pipeline_stats.applied or 1) * 100)|round }}%;">
+  <div class="pipeline-fill"></div>
+</div>
+
+      </div>
+      <div class="col pipeline-stage">
+        <div class="pipeline-number text-info">{{ pipeline_stats.interview or 0 }}</div>
+        <div class="small text-muted">Interview</div>
+       <div class="pipeline-bar" 
+     style="--progress: {{ (pipeline_stats.offer / (pipeline_stats.applied or 1) * 100)|round }}%;">
+  <div class="pipeline-fill"></div>
+</div>
+
+      <div class="col pipeline-stage">
+        <div class="pipeline-number text-purple">{{ pipeline_stats.offer or 0 }}</div>
+        <div class="small text-muted">Offer</div>
+       <div class="pipeline-bar" 
+     style="--progress: {{ (pipeline_stats.offer / (pipeline_stats.applied or 1) * 100)|round }}%;">
+  <div class="pipeline-fill"></div>
+</div>
+
+      <div class="col pipeline-stage">
+        <div class="pipeline-number text-success">{{ pipeline_stats.hired or 0 }}</div>
+        <div class="small text-muted">Hired</div>
+       <div class="pipeline-bar" 
+     style="--progress: {{ (pipeline_stats.offer / (pipeline_stats.applied or 1) * 100)|round }}%;">
+  <div class="pipeline-fill"></div>
+</div>
+
+      </div>
+    </div>
+  </div> 
+
+  <!-- Quick Actions -->
+  <div class="quick-actions">
+    <a href="/HR1/Company_Job_Posting" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #3b82f6, #1e40af);">
+        ➕
+      </div>
+      <h5 class="fw-semibold mb-2">Post New Job</h5>
+      <p class="small text-muted mb-0">Create and publish new job openings</p>
+    </a>
+
+    <a href="/Company_Candidates" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #10b981, #047857);">
+        👥
+      </div>
+      <h5 class="fw-semibold mb-2">Review Candidates</h5>
+      <p class="small text-muted mb-0">View and rank applicant profiles</p>
+    </a>
+
+    <a href="/HR1/interviews" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+        📅
+      </div>
+      <h5 class="fw-semibold mb-2">Schedule Interviews</h5>
+      <p class="small text-muted mb-0">Manage interview appointments</p>
+    </a>
+
+    <!-- <a href="/HR1/reports" class="action-card">
+      <div class="action-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+        📊
+      </div>
+      <h5 class="fw-semibold mb-2">View Reports</h5>
+      <p class="small text-muted mb-0">Analytics and hiring metrics</p>
+    </a>-->
+  </div> 
+
+  <!-- Recent Activity & Top Candidates -->
+  <div class="row">
+    <!-- Recent Activity -->
+    <div class="col-lg-6">
+      <div class="activity-feed">
+        <h5 class="mb-4">Recent Activity</h5>
+        {% for activity in recent_activities %}
+      <div class="activity-item" style="--icon-color: {{ activity.color }}; height: 0.5rem; background-color: #ff8a73; "> 
+  <!--<div class="activity-icon">
+    {{ activity.icon }}
+  </div>-->
+</div>
+
+          <div class="activity-content">
+            <div class="activity-title">{{ activity.title }}</div>
+            <div class="activity-description">
+              {{ activity.description }}
+              {% if activity.enhanced %}
+              <!-- <span class="ai-badge">AI</span> -->
+              {% endif %}
+            
+            
+            <div class="activity-time mt-15">{{ activity.time_ago }}</div>
+          </div>
+        </div>
+        {% endfor %}
+        
+        {% if not recent_activities %}
+        <div class="text-center py-4 text-muted">
+          <div class="h4 mb-2">📊</div>
+          <p class="mb-0">No recent activity</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Top Candidates -->
+    <div class="col-lg-6 mb-15">
+      <div class="candidates-preview">
+        <h5 class="mb-16">Top Candidates This Week</h5>
+        {% for candidate in top_candidates %}
+        <div class="candidate-item">
+          <div class="candidate-avatar">
+            {{ (candidate.name or 'U')[0]|upper }}
+          </div>
+          <div class="candidate-info">
+            <div class="candidate-name">{{ candidate.name }}</div>
+            <div class="candidate-role">{{ candidate.job_title }}</div>
+          </div>
+          <div class="candidate-scores">
+            <span class="score-badge">{{ candidate.match_score }}%</span>
+            {% if candidate.ai_enhanced %}
+            <span class="ai-badge">AI</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        
+        {% if not top_candidates %}
+        <div class="text-center py-4 text-muted">
+          <div class="h4 mb-2">👥</div>
+          <p class="mb-0">No new candidates this week</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Update time every minute
+function updateTime() {
+  const now = new Date();
+  const timeElements = document.querySelectorAll('.dashboard-header .h4');
+  if (timeElements.length > 0) {
+    timeElements[0].textContent = now.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+  }
+}
+
+setInterval(updateTime, 60000);
+
+// Add interactivity to stat cards
+document.querySelectorAll('.stat-card').forEach(card => {
+  card.addEventListener('click', function() {
+    this.style.transform = 'scale(0.98)';
+    setTimeout(() => {
+      this.style.transform = '';
+    }, 150);
+  });
+});
+
+// Real-time data updates
+function updateDashboardStats() {
+  fetch('/api/dashboard_stats_hr')
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) return;
+      
+      // Update stat numbers
+      const statNumbers = document.querySelectorAll('.stat-number');
+      if (statNumbers[0]) statNumbers[0].textContent = data.total_jobs || 0;
+      if (statNumbers[1]) statNumbers[1].textContent = data.total_applications || 0;
+      if (statNumbers[2]) statNumbers[2].textContent = data.interviews_scheduled || 0;
+      if (statNumbers[3]) statNumbers[3].textContent = data.avg_match_score + '%' || '0%';
+    })
+    .catch(error => console.log('Stats update failed:', error));
+}
+
+// Update every 5 minutes
+setInterval(updateDashboardStats, 5 * 60 * 1000);
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  // Animate pipeline bars
+  const pipelineFills = document.querySelectorAll('.pipeline-fill');
+  pipelineFills.forEach((fill, index) => {
+    setTimeout(() => {
+      fill.style.width = fill.style.width;
+    }, index * 200);
+  });
+});
+
+function loadHRInsights() {
+    const jobId = document.getElementById('job-select').value;
+    const container = document.getElementById('hr-insights-container');
+    
+    if (!jobId) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    fetch(`/api/hr_insights/${jobId}`)
+        .then(response => response.json())
+        .then(data => {
+            let html = `
+                <div class="insight-item">
+                    <div class="insight-title">Pipeline Analysis</div>
+                    <div class="insight-description">${data.insight}</div>
+                </div>
+            `;
+            
+            if (data.predictions && data.predictions.length > 0) {
+                data.predictions.forEach(pred => {
+                    html += `
+                        <div class="insight-item">
+                            <div class="insight-title">${pred.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</div>
+                            <div class="insight-description">${pred.prediction}</div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted opacity-75">
+                                    ${pred.confidence} confidence | ${pred.timeframe}
+                                </small>
+                                ${pred.action_required ? 
+                                    `<span class="insight-action" style="background: rgba(255,255,255,0.3); color: inherit; font-size: 0.75rem;">
+                                        Action: ${pred.action_required}
+                                    </span>` : ''
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            if (data.metrics) {
+                html += `
+                    <div class="insight-item">
+                        <div class="insight-title">Key Metrics</div>
+                        <div class="insight-description">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 600;">${data.metrics.total_applications}</div>
+                                    <div style="font-size: 0.75rem; opacity: 0.8;">Total Apps</div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 600;">${data.metrics.excellent_candidates}</div>
+                                    <div style="font-size: 0.75rem; opacity: 0.8;">Excellent</div>
+                                </div>
+                                <div class="col-4">
+                                    <div style="font-size: 1.5rem; font-weight: 600;">${data.metrics.avg_match_score}%</div>
+                                    <div style="font-size: 0.75rem; opacity: 0.8;">Avg Score</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('hr-insights').innerHTML = html;
+            container.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading HR insights:', error);
+            document.getElementById('hr-insights').innerHTML = `
+                <div class="insight-item">
+                    <div class="insight-title">Error</div>
+                    <div class="insight-description">Unable to load insights. Please try again.</div>
+                </div>
+            `;
+            container.style.display = 'block';
+        });
+}
+</script>
+
+{% endblock %}

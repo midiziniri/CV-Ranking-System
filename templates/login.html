@@ -1,0 +1,254 @@
+<!--login.html - FIXED to work with existing loginpage route-->
+{% extends "base.html" %}
+{% block title %}Login - Resume Ranking System{% endblock %}
+
+{% block styleInclude %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<style>
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.flash-message.error {
+    background-color: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.flash-message.success {
+    background-color: #efe;
+    color: #363;
+    border: 1px solid #cfc;
+}
+
+.flash-message.info {
+    background-color: #e7f3ff;
+    color: #0066cc;
+    border: 1px solid #b3d9ff;
+}
+
+.flash-message.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.email-verification-box {
+    background: #e7f3ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.resend-form {
+    margin-top: 1rem;
+}
+
+.resend-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.resend-btn:hover {
+    background: #5a6268;
+}
+
+.registration-links {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #040404;
+}
+
+.registration-links a {
+    color: #006214;
+    text-decoration: none;
+    margin: 0 1rem;
+    font-weight: 500;
+}
+
+.registration-links a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .registration-links a {
+        display: block;
+        margin: 0.5rem 0;
+    }
+}
+/* Email Verification Box Styles */
+.email-verification-box {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.email-verification-box strong {
+    display: block;
+    color: #856404;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.email-verification-box p {
+    color: #856404;
+    margin: 0.75rem 0 1rem 0;
+    line-height: 1.5;
+}
+
+.resend-form {
+    margin: 0;
+}
+
+.resend-btn {
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.resend-btn:hover {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 152, 0, 0.4);
+}
+
+.resend-btn:active {
+    transform: translateY(0);
+}
+
+/* Flash message styles */
+.flash-message {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.flash-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.flash-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.flash-message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.flash-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="center-wrapper mt-5">
+        <main1 class="login-container1" role="main">
+            <h1 id="loginTitle" class="login-heading1">Login</h1>
+ 
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %} 
+
+            <!-- Show email verification box if user tried to login with pending email -->
+            {% if email %}
+            <div class="email-verification-box">
+                <strong>Email Verification Required</strong>
+                <p>Please check your email and click the verification link to activate your account.</p>
+                <form action="/resend-verification" method="POST" class="resend-form">
+                    <input type="hidden" name="email" value="{{ email }}">
+                    <button type="submit" class="resend-btn">Resend Verification Email</button>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Login Form - EXACTLY same as your existing structure -->
+            <form aria-label="Login form" action="/loginpage" method="POST">
+                <div class="input-group1">
+                    <label for="emailInput">Email:</label>
+                    <input id="emailInput" class="input1" name="email" type="email" required 
+                           value="{{ email if email else '' }}" />
+                </div>
+
+                <div class="input-group1">
+                    <label for="passwordInput">Password:</label>
+                    <input id="passwordInput" class="input1" name="password" type="password" required />
+                </div>
+
+                <button type="submit" class="login-btn1" aria-label="Submit Login Form">Login</button>
+            </form>
+
+            <!-- <div class="separator1" aria-label="Or separator"></div> -->
+
+   
+
+            <!-- Registration Links -->
+            <div class="registration-links">
+                <strong>New to our platform?</strong><br>
+                <a href="/register_applicant">Job Seeker Registration</a><br>
+                <a href="/register_employer">HR/Recruiter Registration</a>
+            </div>
+        </main1>
+    </div>
+</main>
+
+<script>
+document.querySelectorAll('.input-group1 input').forEach(input => {
+    const label = input.previousElementSibling;
+
+    function toggleLabel() {
+        if (input.value.trim() !== '') {
+            label.style.display = 'none';
+        } else {
+            label.style.display = 'block';
+        }
+    }
+
+    input.addEventListener('input', toggleLabel);
+    input.addEventListener('blur', toggleLabel);
+    input.addEventListener('focus', toggleLabel);
+
+    // Initial state
+    toggleLabel();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,251 @@
+
+
+.center-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 10vh; /* full viewport height */
+
+}
+
+
+
+.login-container1 {
+  background-color: #c8d9ff;
+  width: 100%;
+  max-width: 400px;
+  padding: 1.75rem 2rem 2rem;
+  margin-top: 1rem;
+  border-radius: 1.5rem;
+  box-sizing: border-box;
+  box-shadow: 0 8px 16px rgb(34 37 54 / 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+
+.login-heading1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  font-family: 'Georgia', serif;
+  user-select: none;
+  color: #000;
+}
+
+.input-group1 {
+  width: 100%;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+input[type="email"].input1,
+input[type="text"].input1,
+input[type="password"].input1 {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 2.5px solid #d6d7d3;
+  font-size: 1.25rem;
+  font-family: 'Georgia', serif;
+  color: #666666;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+
+select.input1 {
+  width: 100%;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 2.5px solid #d6d7d3;
+  font-size: 1.25rem;
+  font-family: 'Georgia', serif;
+  color: #666666;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  background-color: white; /* make sure dropdown background is white */
+  appearance: none; /* hide default arrow in some browsers */
+  background-image: url("data:image/svg+xml,%3Csvg fill='gray' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+}
+
+input[type="email"].input1:focus,
+input[type="text"].input1:focus,
+input[type="password"].input1:focus {
+  border-color: #4299e1;
+}
+
+.input-group1 label {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Georgia', serif;
+  font-size: 1.25rem;
+  color: #888888;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+.flash-message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.flash-message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.flash-message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+
+.input-icon1 {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  cursor: default;
+  user-select: none;
+  fill: black;
+}
+
+.forgot-password1 {
+    margin-top: 0.50rem;
+  
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: 'Georgia', serif;
+  color: #7189e4;
+
+text-decoration: none;
+
+}
+
+.forgot-password1:hover {
+  text-decoration: underline;
+}
+
+.login-btn1 {
+ 
+  display: block;
+  width: 100%;
+  background-color: #4299e1;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+  font-family: 'Georgia', serif;
+  color: black;
+
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+  border: none;
+  margin-bottom: 1rem;
+   margin-top: 1rem;
+}
+
+.login-btn1:hover {
+  background-color: #2b6cb0;
+  color: white;
+  text-decoration: none;
+}
+
+.account-prompt1 {
+  font-family: 'Georgia', serif;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  user-select: none;
+  color: #2d2a2a;
+}
+
+.account-prompt1 b {
+  font-weight: 900;
+}
+
+.sign-up-link1 {
+   font-weight: 600;
+  font-family: 'Georgia', serif;
+  color: #7189e4;
+
+  cursor: pointer;
+  
+  user-select: none;
+    text-decoration: none;
+
+}
+
+.sign-up-link1:hover {
+  
+   text-decoration: underline;
+   
+
+}
+
+.separator1 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: 'Georgia', serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 1.25rem;
+  user-select: none;
+  color: #000;
+}
+
+.separator1::before,
+.separator1::after {
+  content: "";
+  flex: 1;
+  border-bottom: 2px solid black;
+  margin: 0 0.75rem;
+}
+
+.google-btn1 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 0.75rem;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: black;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.3s ease;
+}
+
+.google-btn1:hover {
+  box-shadow: 0 0 8px #4285f4;
+}
+
+.google-logo1 {
+  width: 24px;
+  height: 24px;
+  user-select: none;
+  pointer-events: none;
+}

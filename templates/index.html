@@ -1,0 +1,576 @@
+{% extends "base.html" %}
+{% block body_class %}index-page{% endblock %}
+{% block title %}Resume Ranking System{% endblock %}
+
+{% block Addnav %}
+{% endblock %}
+
+{% block styleInclude %}
+<style>
+  /* Original styles from your base design */
+  @media screen and (min-width: 992px) {
+    a.sign_in {
+      width: 60%;
+    }
+  }
+  @media screen and (min-width: 1300px) {
+    a.sign_in {
+      width: 40%;
+    }
+  }
+  @media screen and (min-width: 300px) {
+    .main_card {
+      margin-top: 30px;
+    }
+  }
+
+  .sign_in {
+    border: none;
+    border-radius: 4px;
+    margin: 5px 0;
+    opacity: 0.85;
+    display: inline-block;
+    font-size: 17px;
+    line-height: 20px;
+    text-decoration: none;
+    background-color: #dd4b39;
+    color: white;
+  }
+
+  /* Enhanced styles for the index page */
+  .hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-top: 120px;
+    margin-top: 0;
+  }
+
+  .hero-content {
+    text-align: center;
+    color: white;
+    z-index: 2;
+    position: relative;
+    margin-top: 0rem;
+    margin-bottom: 10rem;
+  }
+
+  .logo-left {
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    margin-top: 0;
+  }
+
+  .hero-quote {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .hero-subtext {
+    font-size: 1.25rem;
+    font-weight: 400;
+    margin-bottom: 2.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.95;
+    line-height: 1.6;
+  }
+
+  .btn-getstarted {
+    background: linear-gradient(135deg, #10b981, #047857);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-getstarted:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
+    background: linear-gradient(135deg, #059669, #065f46);
+  }
+
+  /* Registration Section Styles */
+  .registration-section {
+    min-height: 100vh;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+
+  .registration-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none"><polygon fill="%23764ba2" points="1000,0 0,0 0,100"/></svg>');
+    background-size: cover;
+    height: 100px;
+    top: -50px;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: #1f2937;
+    position: relative;
+    z-index: 2;
+  }
+
+  .section-title h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #7891ff 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-title p {
+    font-size: 1.2rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .registration-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 3rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  .registration-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .registration-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(135deg, #7891ff 0%, #764ba2 100%);
+  }
+
+  .registration-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .applicant-card .card-icon {
+    background: linear-gradient(135deg, #10b981, #047857);
+  }
+
+  .hr-card .card-icon {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+  }
+
+  .card-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #1f2937;
+  }
+
+  .card-description {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+
+  .card-features {
+    list-style: none;
+    margin-bottom: 2.5rem;
+    padding: 0;
+  }
+
+  .card-features li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .card-features li i {
+    color: #10b981;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+  }
+
+  /* Enhanced sign_in button for registration cards */
+  .registration-card .sign_in {
+    width: 100%;
+    background: linear-gradient(135deg, #7891ff 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(120, 145, 255, 0.3);
+    opacity: 1;
+    text-align: center;
+  }
+
+  .registration-card .sign_in:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(120, 145, 255, 0.4);
+    color: white;
+    text-decoration: none;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+  }
+
+  .hr-card .sign_in {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  }
+
+  .hr-card .sign_in:hover {
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  }
+
+  /* Login section at bottom */
+  .login-section {
+    background: #f8fafc;
+    padding: 2rem 0;
+    text-align: center;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .login-text {
+    color: #64748b;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .login-btn {
+    background: #475569;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .login-btn:hover {
+    background: #334155;
+    transform: translateY(-1px);
+    color: white;
+    text-decoration: none;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .hero-quote {
+      font-size: 2.5rem;
+    }
+
+    .hero-subtext {
+      font-size: 1.1rem;
+      padding: 0 1rem;
+    }
+
+    .btn-getstarted {
+      font-size: 1.2rem;
+      padding: 0.8rem 2rem;
+    }
+
+    .registration-cards {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+
+    .registration-card {
+      padding: 2rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+    }
+
+    .card-features li {
+      font-size: 0.95rem;
+    }
+
+    .registration-card .sign_in {
+      font-size: 1.1rem;
+      padding: 0.9rem 1.5rem;
+    }
+  }
+
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-up {
+    animation: slideUp 0.6s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Loading indicator */
+  .loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    color: white;
+    font-size: 1.25rem;
+    display: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<main role="main" >
+  <!-- Hero Section -->
+  <section id="home" class="hero-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-20">
+          <div class="hero-content fade-in">
+            <div class="col-md-20 col-xs-30" style="display: block; justify-content: center; ">
+              <img
+                class="img-fluid logo-left"
+                src="{{ url_for('static',filename='images/hirearchylogo.png') }}"
+                alt="Hirearchy Logo"
+              />
+            </div>
+            
+            <h1 id="hero-heading" class="hero-quote">
+              "HIRE SMARTER.<br />APPLY BETTER."
+            </h1>
+            
+            <p class="hero-subtext">
+              Whether you're looking for your next great hire or your next big opportunity, Hirearchy helps both sides connect smarter, faster, and better.
+            </p>
+            
+            <button class="btn-getstarted" onclick="scrollToRegistration()" aria-label="Get started with Hirearchy">
+              Get Started
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Registration Section -->
+  <section id="registration" class="registration-section">
+    <div class="container">
+      <div class="section-title slide-up">
+        <h2>Choose Your Path</h2>
+        <p>Join thousands of professionals who trust Hirearchy to connect talent with opportunity</p>
+      </div>
+
+      <div class="registration-cards">
+        <!-- Applicant Card -->
+        <div class="registration-card applicant-card slide-up">
+          <div class="card-icon">
+            <i class="fas fa-user-graduate"></i>
+          </div>
+          <h3 class="card-title">For Job Seekers</h3>
+          <p class="card-description">
+            Stand out from the crowd with our intelligent resume ranking system and get matched with your perfect job.
+          </p>
+          <ul class="card-features">
+            <li><i class="fas fa-check-circle"></i> Smart Resume Optimization</li>
+            <li><i class="fas fa-check-circle"></i> Personalized Job Matching</li>
+            <li><i class="fas fa-check-circle"></i> Application Tracking</li>
+            <li><i class="fas fa-check-circle"></i> Interview Preparation</li>
+            <li><i class="fas fa-check-circle"></i> Career Insights</li>
+          </ul>
+          <!-- FIXED: Changed from /applicant/register to /register_applicant -->
+<a href="{{ url_for('register_applicant') }}" class="sign_in">Job Seeker Registration</a>
+          <!-- <i class="fas fa-user-plus me-2 te"></i>
+            Register as Job Seeker-->
+          </a>
+        </div>
+
+        <!-- HR Card -->
+        <div class="registration-card hr-card slide-up">
+          <div class="card-icon">
+            <i class="fas fa-users-cog"></i>
+          </div>
+          <h3 class="card-title">For HR Professionals</h3>
+          <p class="card-description">
+            Streamline your hiring process with AI-powered candidate ranking and find the perfect fit faster.
+          </p>
+          <ul class="card-features">
+            <li><i class="fas fa-check-circle"></i> AI-Powered Candidate Ranking</li>
+            <li><i class="fas fa-check-circle"></i> Advanced Filtering Options</li>
+            <li><i class="fas fa-check-circle"></i> Collaborative Hiring Tools</li>
+            <li><i class="fas fa-check-circle"></i> Interview Scheduling</li>
+            <li><i class="fas fa-check-circle"></i> Analytics Dashboard</li>
+          </ul>
+          <!-- FIXED: Changed from /hr/register to /register_employer -->
+           <a href="{{ url_for('register_employer') }}" class="sign_in">HR/Recruiter Registration</a>
+           <!-- <i class="fas fa-briefcase me-2"></i>
+            Register as HR Professional-->
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Login Section -->
+  <section class="login-section">
+    <div class="container">
+      <p class="login-text">Already have an account?</p>
+      <a href="/loginpage" class="login-btn">Sign In Here</a>
+    </div>
+  </section>
+
+  <!-- Loading indicator -->
+  <div class="loading" id="loading">
+    <i class="fas fa-spinner fa-spin"></i> Loading...
+  </div>
+</main>
+
+<script>
+  // Smooth scroll to registration section
+  function scrollToRegistration() {
+    document.getElementById('registration').scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }
+
+  // Animation on scroll
+  function animateOnScroll() {
+    const elements = document.querySelectorAll('.slide-up');
+    const windowHeight = window.innerHeight;
+
+    elements.forEach(element => {
+      const elementTop = element.getBoundingClientRect().top;
+      if (elementTop < windowHeight - 100) {
+        element.style.animation = 'slideUp 0.6s ease-out forwards';
+      }
+    });
+  }
+
+  // Event listeners
+  window.addEventListener('scroll', animateOnScroll);
+  window.addEventListener('load', () => {
+    document.body.classList.add('fade-in');
+    animateOnScroll();
+  });
+
+  // Handle click events for registration buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const registrationLinks = document.querySelectorAll('.registration-card .sign_in');
+    registrationLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        // Show loading indicator
+        document.getElementById('loading').style.display = 'block';
+        
+        // Small delay for visual feedback
+        setTimeout(() => {
+          document.getElementById('loading').style.display = 'none';
+        }, 500);
+      });
+    });
+    
+    // Initial animation
+    animateOnScroll();
+  });
+</script>
+<!--.\venv\Scripts\activate     cd C:\xampp\htdocs  ner-annotation-env\Scripts\Activate.ps1              .\ngrok.exe http 8080-->
+{% endblock %}
+<!--  
+
+cd C:\xampp\htdocs
+.\ngrok.exe http 8080
+get the link
+paste it into the notes
+# Stop LocalTunnel (Ctrl+C in that terminal)
+# Restart with bypass flag:
+npx localtunnel --port 8080 --local-https false
+ssh -R 80:localhost:8080 serveo.net
+-->

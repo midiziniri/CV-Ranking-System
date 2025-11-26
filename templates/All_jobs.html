@@ -1,0 +1,1020 @@
+<!--All_jobs.html-->
+{% extends "base.html" %}
+
+{% block title %}Browse Jobs{% endblock %}
+
+{% block Addnav %}
+<!--<li class="nav-item active">
+  <a class="nav-links" role="menuitem" href="/HR1/show_job">Jobs</a>
+</li>-->
+{% endblock %}
+
+{% block content %}
+<style>
+.modal-lg {
+  max-width: 600px;
+}
+
+.document-portfolio {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.document-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.document-item:hover {
+  background: #f8fafc;
+}
+
+.document-item.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.document-checkbox {
+  margin-right: 0.75rem;
+  transform: scale(1.1);
+}
+
+.document-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.doc-pdf { background: #ef4444; }
+.doc-jpg, .doc-jpeg, .doc-png { background: #10b981; }
+.doc-doc, .doc-docx { background: #2563eb; }
+.doc-default { background: #6b7280; }
+
+.document-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.document-name {
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.document-category {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.category-certification { background: #fef3c7; color: #92400e; }
+.category-achievement { background: #dcfce7; color: #166534; }
+.category-portfolio { background: #e0f2fe; color: #0369a1; }
+.category-transcript { background: #f3e8ff; color: #7c2d12; }
+.category-recommendation { background: #fce7f3; color: #be185d; }
+
+.application-summary {
+  background: #f8fafc;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.empty-portfolio {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}
+
+@media (max-width: 576px) {
+  .modal-lg {
+    max-width: 95%;
+    margin: 3rem;
+  }
+  
+  .document-portfolio {
+    max-height: 200px;
+  }
+}
+
+
+
+
+
+
+.jobs-page {
+   background: #fafafa;
+  border-top: 4px solid #8bb7ff; 
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.page-header {
+background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-filters {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.filter-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 300px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.job-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-left: 4px solid transparent;
+}
+
+.job-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.job-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-left-color: #3b82f6;
+}
+
+.job-card.applied {
+  border-left-color: #10b981;
+  background: linear-gradient(135deg, #f0fdf4, #ffffff);
+}
+
+.job-card.hot-job::after {
+  content: '🔥 Hot';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #ef4444;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.job-card.new-job::after {
+  content: '✨ New';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.company-logo {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.75rem;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.job-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.company-name {
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.job-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+}
+
+.salary {
+  font-weight: 600;
+  color: #059669;
+}
+
+.deadline {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.job-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.btn-enhanced {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.btn-view {
+  background: #f3f4f6;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-view:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.btn-apply {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-apply:hover {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-applied {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.status-badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-open {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-closed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: white;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.modal-enhanced .modal-content {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    z-index: 1055 !important;
+    margin-top: 5rem;
+}
+
+.modal-enhanced .modal-header {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: none;
+    z-index: 1055 !important;
+
+}
+
+.modal-enhanced .modal-body {
+  padding: 2rem;
+    z-index: 1055 !important;
+
+}
+
+.resume-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  transition: border-color 0.3s ease;
+}
+
+.resume-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal-enhanced .btn-submit {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.modal-backdrop {
+        z-index: 0 !important;
+       
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vh !important;
+        height: 100vh !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+      }
+
+.modal-enhanced .btn-submit:hover {
+  background: linear-gradient(135deg, #059669, #065f46);
+  transform: translateY(-1px);
+}
+
+.ai-indicator {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.match-indicator {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+  display: none;
+}
+
+.match-score {
+  font-weight: 700;
+  color: #0369a1;
+}
+
+@media (max-width: 768px) {
+  .jobs-page {
+    padding: 1rem 0;
+  }
+  
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    min-width: auto;
+  }
+  
+  .job-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .job-card {
+    padding: 1rem;
+  }
+  
+  .company-logo {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .job-title {
+    font-size: 1.125rem;
+  }
+}
+</style>
+
+<div class="jobs-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h1 class="h2 mb-2">Available Jobs</h1>
+          <p class="mb-0 opacity-90">Discover your next career opportunity</p>
+        </div>
+        <div class="text-end">
+          <div class="h4 mb-1">{{ data|length }}</div>
+          <div class="small opacity-75">Open Positions</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-filters">
+      <div class="filter-section">
+        <input 
+          type="text" 
+          id="jobSearch" 
+          class="search-input" 
+          placeholder="Search jobs by title, company, or keywords..."
+        >
+        <!-- <select id="salaryFilter" class="filter-select">
+          <option value="">All Salaries</option>
+          <option value="entry">Entry Level</option>
+          <option value="mid">Mid Level</option>
+          <option value="senior">Senior Level</option>
+        </select> -->
+        <select id="sortBy" class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="salary">Salary</option>
+          <option value="deadline">Deadline</option>
+          <option value="company">Company</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Jobs Grid -->
+    <div class="jobs-grid" id="jobsContainer">
+      {% for i in range(0, data|length) %}
+      {% if data[i]['Status'] == "Open" %}
+      <div class="job-card {% if data[i]['job_id'] in applied_job_ids %}applied{% endif %}" 
+           data-job-title="{{ data[i]['Job_Profile']|lower }}"
+           data-company="{{ data[i]['CompanyName']|lower }}"
+           data-salary="{{ data[i]['Salary'] }}"
+           data-deadline="{{ data[i]['LastDate'] }}">
+        
+        <!-- Status Badge -->
+        <div class="status-badge status-{{ data[i]['Status']|lower }}">
+          {{ data[i]['Status'] }}
+        </div>
+
+        <!-- Company Logo -->
+        {% if data[i]['CompanyLogo'] %}
+        <img src="{{ url_for('static', filename='company_logos/' + data[i]['CompanyLogo']) }}" 
+             class="company-logo" alt="{{ data[i]['CompanyName'] }} Logo">
+        {% else %}
+        <img src="{{ url_for('static', filename='images/logo2.png') }}" 
+             class="company-logo" alt="Company Logo">
+        {% endif %}
+
+        <!-- Job Info -->
+        <h3 class="job-title">{{ data[i]['Job_Profile'] }}</h3>
+        <div class="company-name">{{ data[i]['CompanyName'] }}</div>
+
+        <!-- Job Meta -->
+        <div class="job-meta">
+          <div class="salary">{{ data[i]['Salary'] }}</div>
+          <div class="deadline">
+            <small>Deadline: {{ data[i]['LastDate'] }}</small>
+          </div>
+        </div>
+
+        <!-- Match Indicator (will be populated by AI analysis) 
+        <div class="match-indicator" id="match-{{ data[i]['job_id'] }}">
+          <div class="small text-muted mb-1">AI Match Analysis</div>
+          <div class="match-score">Calculating match...</div>
+        </div>-->
+
+        <!-- Actions -->
+        <div class="job-actions">
+          <a href="/static/Job_Description/{{ data[i]['job_id'] }}/{{ data[i]['Job_description_file_name'] | urlencode }}"
+             target="_blank"
+             class="btn-enhanced btn-view">
+             View Details
+          </a>
+
+          {% if data[i]['job_id'] in applied_job_ids %}
+            <button class="btn-enhanced btn-applied" disabled>
+              Applied ✓
+            </button>
+          {% else %}
+            <button data-job-id="{{ data[i]['job_id'] }}"
+                    class="btn-enhanced btn-apply apply-btn">
+              Apply Now
+             <!--<span class="ai-indicator">AI Enhanced</span>-->
+            </button>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    {% if not data %}
+    <div class="empty-state">
+      <div class="empty-icon">💼</div>
+      <h3>No jobs available</h3>
+      <p>Check back later for new opportunities</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Enhanced Resume Selection Modal with Document Portfolio -->
+<div class="modal fade modal-enhanced" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 id="resumeModalLabel" class="modal-title">
+          🚀 Complete Your Application
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Resume Selection -->
+        <div class="mb-4">
+          <label for="resumeSelect" class="form-label fw-semibold">Choose Your Resume *</label>
+          <select id="resumeSelect" class="resume-select" name="resumeSelect" required>
+            <option value="">Loading your resumes...</option>
+          </select>
+        </div>
+
+        <!-- Document Portfolio Section -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Attach Supporting Documents (Optional)</label>
+          <p class="text-muted small mb-3">Select relevant documents to strengthen your application</p>
+          
+          <div id="documentPortfolio" class="document-portfolio">
+            <div class="text-center text-muted py-4" id="loadingDocuments">
+              <div class="spinner-border spinner-border-sm me-2"></div>
+              Loading your documents...
+            </div>
+          </div>
+        </div>
+
+        <!-- Application Preview 
+        <div class="alert alert-info d-none" id="applicationPreview">
+          <h6 class="fw-semibold mb-2">Application Summary</h6>
+          <div class="row text-center">
+            <div class="col-4">
+              <div class="fw-bold text-primary" id="resumePreview">-</div>
+              <small class="text-muted">Resume</small>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-success" id="documentsCount">0</div>
+              <small class="text-muted">Documents</small>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold text-warning" id="estimatedMatch">-</div>
+              <small class="text-muted">Est. Match</small>
+            </div>
+          </div>
+        </div>
+      -->
+        <div class="alert alert-warning d-none" id="noDocumentsAlert">
+          <small><i class="bi bi-info-circle me-1"></i> No documents in your portfolio. <a href="/profile" target="_blank">Upload documents</a> to enhance future applications.</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirmApplyBtn" class="btn btn-submit" disabled>
+          Submit Application
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+
+<script>
+let selectedJobId = "";
+let selectedDocuments = new Set();
+
+$(document).ready(function() {
+  console.log("Enhanced job listings loaded");
+
+  // Search and filter functionality
+  $('#jobSearch, #salaryFilter, #sortBy').on('input change', function() {
+    filterAndSortJobs();
+  });
+
+  // Apply button click handler
+  $('.apply-btn').on('click', function() {
+    selectedJobId = $(this).data('job-id');
+    selectedDocuments.clear();
+    
+    console.log("Applying for job:", selectedJobId);
+    
+    // Reset UI
+    $('#applicationPreview').addClass('d-none');
+    $('#noDocumentsAlert').addClass('d-none');
+    $('#confirmApplyBtn').prop('disabled', false);
+    $('#confirmApplyBtn').html('Submit Application'); // Reset button text
+    // Load resumes and documents
+    loadApplicationData();
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('resumeModal'));
+    modal.show();
+  });
+
+  // Resume selection change handler
+  $('#resumeSelect').on('change', function() {
+    updateApplicationPreview();
+  });
+});
+
+function loadApplicationData() {
+  // Load resumes
+  $('#resumeSelect').html('<option value="">Loading your resumes...</option>');
+  
+
+     $.get('/HR1/get_user_resumes')
+    .done(function(data) {
+      let options = '';
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(function(resume) {
+          options += `<option value="${resume._id}">${resume.ResumeTitle}</option>`;
+        });
+      } else {
+        options = '<option value="">No resumes found - Please upload a resume first</option>';
+      }
+      $('#resumeSelect').html(options);
+    })
+    .fail(function() {
+      $('#resumeSelect').html('<option value="">Error loading resumes</option>');
+    });
+
+  // Load user documents
+  $('#loadingDocuments').show();
+  $('#documentPortfolio').find('.document-item').remove();
+  
+  $.get('/get_user_documents')
+    .done(function(documents) {
+      $('#loadingDocuments').hide();
+      
+      if (documents.length > 0) {
+        let documentHtml = '';
+        documents.forEach(function(doc) {
+          const categoryClass = `category-${doc.Category}`;
+          documentHtml += `
+            <div class="document-item" data-document-id="${doc._id}" onclick="toggleDocument('${doc._id}')">
+              <input type="checkbox" class="document-checkbox" id="doc_${doc._id}">
+              <div class="document-icon doc-${doc.FileExtension}">
+                <i class="bi bi-file-earmark"></i>
+              </div>
+              <div class="document-info">
+                <div class="document-name">${doc.DocumentName}</div>
+                <div class="document-category ${categoryClass}">${doc.Category}</div>
+              </div>
+            </div>
+          `;
+        });
+        $('#documentPortfolio').html(documentHtml);
+      } else {
+        $('#documentPortfolio').html(`
+          <div class="empty-portfolio">
+            <div class="empty-icon">📄</div>
+            <p class="mb-2">No documents in portfolio</p>
+            <small class="text-muted">
+              <a href="/profile" target="_blank">Upload documents</a> to enhance your applications
+            </small>
+          </div>
+        `);
+        $('#noDocumentsAlert').removeClass('d-none');
+      }
+    })
+    .fail(function() {
+      $('#loadingDocuments').hide();
+      $('#documentPortfolio').html(`
+        <div class="empty-portfolio">
+          <div class="empty-icon">⚠️</div>
+          <p class="mb-0 text-danger">Error loading documents</p>
+        </div>
+      `);
+    });
+}
+
+function toggleDocument(documentId) {
+  const checkbox = document.getElementById(`doc_${documentId}`);
+  const documentItem = checkbox.closest('.document-item');
+  
+  if (selectedDocuments.has(documentId)) {
+    selectedDocuments.delete(documentId);
+    checkbox.checked = false;
+    documentItem.classList.remove('selected');
+  } else {
+    selectedDocuments.add(documentId);
+    checkbox.checked = true;
+    documentItem.classList.add('selected');
+  }
+  
+  updateApplicationPreview();
+}
+
+function updateApplicationPreview() {
+  const resumeId = $('#resumeSelect').val();
+  const resumeName = $('#resumeSelect option:selected').text();
+  
+  // ENABLE SUBMIT BUTTON WHEN RESUME IS SELECTED (regardless of documents)
+  if (resumeId && resumeId !== "") {
+    $('#resumePreview').text(resumeName.length > 20 ? resumeName.substring(0, 20) + '...' : resumeName);
+    $('#documentsCount').text(selectedDocuments.size);
+    
+    // Simple match estimation based on document count
+    let estimatedMatch = 75; // Base score
+    if (selectedDocuments.size > 0) {
+      estimatedMatch += Math.min(selectedDocuments.size * 5, 20); // Up to 20% bonus for documents
+    }
+    $('#estimatedMatch').text(estimatedMatch + '%');
+    
+    $('#applicationPreview').removeClass('d-none');
+    $('#confirmApplyBtn').prop('disabled', false); // ENABLE when resume is selected
+  } else {
+    $('#applicationPreview').addClass('d-none');
+    $('#confirmApplyBtn').prop('disabled', false); // Disable only when NO resume selected
+  }
+}
+  // Confirm application submission
+  $('#confirmApplyBtn').on('click', function() {
+    const resumeId = $('#resumeSelect').val();
+    
+    if (!resumeId) {
+      showNotification('Please select a resume.', 'error');
+      return;
+    }
+
+    // Show loading state
+    $(this).html('<span class="spinner-border spinner-border-sm me-2"></span>Submitting...');
+    $(this).prop('disabled', true);
+
+    // Submit application with AI enhancement
+    $.post('/HR1/apply_job_enhanced', {
+      job_id: selectedJobId,
+      resume_id: resumeId
+    })
+    .done(function(data) {
+      console.log("Application response:", data);
+      
+      if (data.StatusCode === 200) {
+        showNotification(
+          `Application submitted successfully! `,
+          'success'
+        );
+        
+        // Update UI to show applied state
+        const applyBtn = $(`.apply-btn[data-job-id="${selectedJobId}"]`);
+        const jobCard = applyBtn.closest('.job-card');
+        
+        jobCard.addClass('applied');
+        applyBtn
+          .removeClass('btn-apply')
+          .addClass('btn-applied')
+          .prop('disabled', true)
+          .html('Applied ✓');
+          
+        // Show match indicator
+        if (data.TraditionalScore) {
+          const matchDiv = $(`#match-${selectedJobId}`);
+          matchDiv.find('.match-score').html(`${data.TraditionalScore}% Match`);
+          matchDiv.show();
+        }
+      } else {
+        showNotification(data.Message || 'Application failed', 'error');
+      }
+    })
+    .fail(function() {
+      showNotification('Application submission failed', 'error');
+    })
+    .always(function() {
+      // Reset button state
+      $('#confirmApplyBtn').html('Submit Application');
+      $('#confirmApplyBtn').prop('disabled', false);
+      
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('resumeModal'));
+      modal.hide();
+    });
+  });
+
+
+
+
+
+
+
+function filterAndSortJobs() {
+  const searchTerm = $('#jobSearch').val().toLowerCase();
+  const salaryFilter = $('#salaryFilter').val();
+  const sortBy = $('#sortBy').val();
+  
+  let jobs = $('.job-card').toArray();
+  
+  // Filter jobs
+  jobs.forEach(function(job) {
+    const $job = $(job);
+    const title = $job.data('job-title') || '';
+    const company = $job.data('company') || '';
+    const salary = ($job.data('salary') || '').toLowerCase();
+    
+    let showJob = true;
+    
+    // Search filter
+    if (searchTerm && !title.includes(searchTerm) && !company.includes(searchTerm)) {
+      showJob = false;
+    }
+    
+    // Salary filter
+    if (salaryFilter) {
+      if (salaryFilter === 'entry' && !salary.includes('entry')) showJob = false;
+      if (salaryFilter === 'mid' && !salary.includes('mid')) showJob = false;
+      if (salaryFilter === 'senior' && !salary.includes('senior')) showJob = false;
+    }
+    
+    $job.toggle(showJob);
+  });
+  
+  // Sort jobs
+  if (sortBy) {
+    const container = $('#jobsContainer');
+    const visibleJobs = container.find('.job-card:visible').toArray();
+    
+    visibleJobs.sort(function(a, b) {
+      const $a = $(a);
+      const $b = $(b);
+      
+      switch (sortBy) {
+        case 'company':
+          return ($a.data('company') || '').localeCompare($b.data('company') || '');
+        case 'deadline':
+          return new Date($a.data('deadline')) - new Date($b.data('deadline'));
+        default:
+          return 0;
+      }
+    });
+    
+    // Reorder DOM elements
+    visibleJobs.forEach(function(job) {
+      container.append(job);
+    });
+  }
+}
+
+
+
+
+
+function showMatchPreview() {
+  // Simulate AI match calculation
+  const skills = Math.floor(Math.random() * 40) + 60; // 60-100%
+  const experience = Math.floor(Math.random() * 30) + 70; // 70-100%
+  const overall = Math.floor((skills + experience) / 2);
+  
+  $('#skillsMatch').text(skills + '%');
+  $('#experienceMatch').text(experience + '%');
+  $('#overallMatch').text(overall + '%');
+  $('#matchPreview').removeClass('d-none');
+}
+
+
+
+function showNotification(message, type) {
+  const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+  const notification = `
+    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+         style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('afterbegin', notification);
+  
+  setTimeout(() => {
+    const alert = document.querySelector('.alert');
+    if (alert) alert.remove();
+  }, 5000);
+}
+</script>
+{% endblock %}

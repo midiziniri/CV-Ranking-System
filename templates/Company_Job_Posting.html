@@ -1,0 +1,1413 @@
+<!--Company_Job_Posting.html-->
+{% extends "base.html" %}
+
+
+{% block title %}Job Post{% endblock %}
+
+{% block Addnav %}
+
+{% endblock %}
+
+{% block content %}
+<style>
+
+    /* Modal Fixes - Critical for functionality */
+      .modal {
+        z-index: 1055 !important;
+        position: absolute !important;
+     
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+       overflow-y: auto !important;
+       margin-top: 15rem;
+      }
+
+      .modal.show {
+        align-items: center !important;
+        justify-content: center !important;
+padding-top: 5rem !important;
+        padding-bottom: 2rem !important;
+      }
+
+      .modal-backdrop {
+        z-index: 0 !important;
+       
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vh !important;
+        height: 100vh !important;
+        background-color: rgba(0, 0, 0, 0.5) !important;
+      }
+
+      .modal-backdrop.show {
+        opacity: 0.5 !important;
+        
+      }
+
+   
+      
+
+      /* Ensure dropdowns in modals work */
+    
+.jobs-page {
+ background: #fafafa;
+  border-top: 4px solid #8bb7ff; 
+  padding: 2rem 0;
+
+}
+
+.page-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #55aaff 100%);
+  border-left: 10px solid #3b82f6;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: #1f2937;
+  box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.05);
+}
+
+.controls-section {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.filter-section {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 300px;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.filter-select {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.btn-post-job {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-post-job:hover {
+  background: linear-gradient(135deg, #059669, #065f46);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.jobs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.job-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.job-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+}
+
+.job-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.company-logo {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 0.75rem;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.job-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.company-name {
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.job-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 0.5rem;
+}
+
+.salary {
+  font-weight: 600;
+  color: #059669;
+}
+
+.deadline {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.status-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-open {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-closed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.weights-indicator {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.job-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.job-actions-full {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-enhanced {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.btn-edit {
+  background: #f3f4f6;
+  color: #374151;
+  border: 2px solid #e5e7eb;
+}
+
+.btn-edit:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+  text-decoration: none;
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-view {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-view:hover {
+  background: linear-gradient(135deg, #2563eb, #1e3a8a);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-candidates {
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-candidates:hover {
+  background: linear-gradient(135deg, #059669, #065f46);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  color: white;
+  text-decoration: none;
+  
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: white;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.modal-enhanced .modal-content {
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+   width: 100vh !important;
+        display: flex;
+        max-height: 85vh;
+    overflow-y: auto;
+       
+}
+
+
+
+.modal-enhanced .modal-header {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  border-radius: 1rem 1rem 0 0;
+  border-bottom: none;
+     width: 100vh !important;
+
+}
+.modal-dialog {
+    max-height: 90vh;
+    margin: 1.75rem auto;
+}
+
+.modal-enhanced .modal-body {
+  padding: 2rem;
+  margin: 0%;
+display: block;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+  max-height: 60vh;
+    overflow-y: auto;
+}
+
+.weight-customizer {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 2px solid #e5e7eb;
+}
+
+.weight-component {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.form-floating {
+  margin-bottom: 1rem;
+  position: relative !important;
+  z-index: 9999 !important;
+  pointer-events: auto !important;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.alert-enhanced {
+  border-radius: 0.75rem;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .jobs-page {
+    padding: 1rem 0;
+    
+  }
+  
+  .jobs-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .page-header {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-input {
+    min-width: auto;
+  }
+  
+  .job-actions-full {
+    grid-template-columns: 1fr;
+  }
+  
+  .job-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .job-card {
+    padding: 1rem;
+  }
+  
+  .company-logo {
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  .job-title {
+    font-size: 1.125rem;
+  }
+}
+
+
+</style>
+
+<div class="jobs-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h1 class="h2 mb-2">Job Management</h1>
+          <p class="mb-0 opacity-90">Manage your company's job postings</p>
+        </div>
+        <div class="text-end">
+          <div class="h4 mb-1">{{ data|length }}</div>
+          <div class="small opacity-75">Total Jobs</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if errorMsg %}
+    <div class="alert alert-danger alert-enhanced text-center mb-3">{{ errorMsg }}</div>
+    {% endif %}
+    {% if successMsg %}
+    <div class="alert alert-success alert-enhanced text-center mb-3">{{ successMsg }}</div>
+    {% endif %}
+
+    <!-- Controls Section -->
+    <div class="controls-section">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <button type="button" class="btn-post-job" data-bs-toggle="modal" data-bs-target="#jobpost">
+          <i class="bi bi-plus-circle"></i>
+          Post New Job
+        </button>
+      </div>
+      
+      <!-- Search and Filter Controls -->
+      <div class="filter-section">
+        <input type="text" id="jobSearch" class="search-input" placeholder="Search jobs by title or company...">
+        <select id="statusFilter" class="filter-select">
+          <option value="">All Status</option>
+          <option value="Open">Open</option>
+          <option value="Closed">Closed</option>
+        </select>
+        <select id="sortOption" class="filter-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="salary_high">Salary: High to Low</option>
+          <option value="salary_low">Salary: Low to High</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Jobs Grid -->
+    <div class="jobs-grid jobs-container">
+      {% for i in range(0, data|length) %}
+      <div class="job-card" 
+           data-created="{{ data[i]['CreatedAt'].strftime('%Y-%m-%dT%H:%M:%S') if data[i]['CreatedAt'] else '' }}"
+           data-salary="{{ (data[i]['Salary'] | string) }}"
+           data-company="{{ data[i]['CompanyName'] }}"
+           data-status="{{ data[i]['Status'] }}">
+        
+        <!-- Status Badge -->
+        <div class="status-badge status-{{ data[i]['Status']|lower }}">
+          {{ data[i]['Status'] }}
+        </div>
+
+        <!-- Weight Configuration Indicator -->
+        {% if data[i].get('ScoringWeights') %}
+        <div class="weights-indicator">
+          <i class="bi bi-sliders"></i>
+          {% if data[i].get('RoleTemplate') and data[i]['RoleTemplate'] != 'custom' %}
+          {{ data[i]['RoleTemplate'].title() }}
+          {% else %}
+          Custom
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Company Logo -->
+        {% if data[i]['CompanyLogo'] %}
+        <img src="{{ url_for('static', filename='company_logos/' + data[i]['CompanyLogo']) }}" 
+             class="company-logo" alt="{{ data[i]['CompanyName'] }} Logo">
+        {% else %}
+        <img src="{{ url_for('static', filename='images/logo2.png') }}" 
+             class="company-logo" alt="Company Logo">
+        {% endif %}
+
+        <!-- Job Info -->
+        <h3 class="job-title">{{ data[i]['Job_Profile'] }}</h3>
+        <div class="company-name">{{ data[i]['CompanyName'] }}</div>
+
+        <!-- Job Meta -->
+        <div class="job-meta">
+          <div class="salary">{{ data[i]['Salary'] }}</div>
+          <div class="deadline">
+            <small>Deadline: {{ data[i]['LastDate'] }}</small>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="job-actions-full">
+          <button type="button" 
+                  class="btn-enhanced btn-edit edit-btn"
+                  data-bs-toggle="modal" 
+                  data-bs-target="#editModal"
+                  data-id="{{ data[i]['job_id'] }}"
+                  data-profile="{{ data[i]['Job_Profile'] }}"
+                  data-company="{{ data[i]['CompanyName'] }}"
+                  data-salary="{{ data[i]['Salary'] }}"
+                  data-lastdate="{{ data[i]['LastDate'] }}"
+                  data-status="{{ data[i]['Status'] }}"
+                  data-logo="{{ data[i]['CompanyLogo'] }}"
+                  data-jdfile="{{ data[i]['Job_description_file_name'] }}"
+                  data-weights="{{ data[i].get('ScoringWeights', {}) | tojson }}"
+                  data-template="{{ data[i].get('RoleTemplate', 'custom') }}">
+            <i class="bi bi-pencil"></i>
+            Edit
+          </button>
+
+          <button class="btn-enhanced btn-delete delete-job" 
+                  data-id="{{ data[i]['job_id'] }}">
+            <i class="bi bi-trash"></i>
+            Delete
+          </button>
+
+          <a href="/static/Job_Description/{{ data[i]['job_id'] }}/{{ data[i]['Job_description_file_name'] | urlencode }}"
+             target="_blank"
+             class="btn-enhanced btn-view">
+             <i class="bi bi-eye"></i>
+             View
+          </a>
+        </div>
+
+        <!--<div class="job-actions mt-2">
+          <button class="btn-enhanced btn-candidates view_candidates" 
+                  id="{{ data[i]['job_id'] }}" 
+                  data-bs-toggle="modal" 
+                  data-bs-target="#view_candidates">
+            <i class="bi bi-people"></i>
+            View Candidates
+          </button>
+        </div>-->
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    {% if not data %}
+    <div class="empty-state">
+      <div class="empty-icon">💼</div>
+      <h3>No jobs posted yet</h3>
+      <p>Create your first job posting to get started</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Post Job Modal --> 
+<div class="modal fade modal-enhanced" id="jobpost" tabindex="-1" aria-hidden="true"> 
+  <div class="modal-dialog modal-lg"> 
+    <div class="modal-content"> 
+      <form class="form-horizontal" action="/HR1/add_job" method="POST" enctype="multipart/form-data" id="jobPostForm"> 
+        <div class="modal-header"> 
+          <h5 class="modal-title">
+            <i class="bi bi-plus-circle me-2"></i>
+            Post New Job
+          </h5> 
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button> 
+        </div> 
+        
+        <div class="modal-body"> 
+          <!-- Basic Job Information -->
+          <div class="mb-3"> 
+            <label for="company_logo" class="form-label">Upload Company Logo</label>
+            <input type="file" class="form-control" id="company_logo" name="company_logo" accept="image/*"/>
+          </div> 
+          
+          <div class="form-floating mb-3"> 
+            <input type="text" class="form-control" id="companyInput" placeholder="Enter Company Name" name="company" required/> 
+            <label for="companyInput">Company Name</label> 
+          </div> 
+          
+          <div class="form-floating mb-3"> 
+            <input type="text" class="form-control" id="jbInput" placeholder="Enter Job Profile" name="jp" required/> 
+            <label for="jbInput">Job Profile</label> 
+          </div> 
+          
+          <div class="form-floating mb-3"> 
+            <input type="text" class="form-control" id="SalaryInput" placeholder="Enter Package" name="salary" required/> 
+            <label for="SalaryInput">Salary Package</label> 
+          </div> 
+          
+          <div class="form-floating mb-3"> 
+            <input type="date" class="form-control" id="LastDateInput" name="last_date" required/>
+            <label for="LastDateInput">Application Deadline</label> 
+          </div> 
+          
+          <div class="mb-3"> 
+            <label for="jd" class="form-label">Upload Job Description</label> 
+            <input type="file" class="form-control" id="jd" name="jd" required/> 
+          </div> 
+          
+          <div class="form-floating mb-3"> 
+            <select class="form-control" id="StatusInput" name="status" required> 
+              <option value="Open" selected>Open</option> 
+              <option value="Closed">Closed</option> 
+            </select> 
+            <label for="StatusInput">Job Status</label>
+          </div>
+
+          <!-- Role Template Selection -->
+          <div class="mb-4">
+            <label for="roleTemplate" class="form-label">
+              <i class="bi bi-bookmark"></i> Role Template
+            </label>
+            <select class="form-select" id="roleTemplate" name="role_template" onchange="loadRoleTemplate()">
+              <option value="custom">Custom Configuration</option>
+            </select>
+            <div class="form-text">Choose a template that matches your role requirements</div>
+          </div>
+
+          <!-- Scoring Weights Customizer -->
+          <div class="weight-customizer" id="weight-customizer">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="p-2 bg-primary rounded text-white">
+                  <i class="bi bi-sliders fs-5"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0">Scoring Weights</h5>
+                  <small class="text-muted">Customize the importance of each criteria</small>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onclick="resetWeights()">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset
+              </button>
+            </div>
+
+            <div id="template-description" class="alert alert-info d-none mb-4"></div>
+
+            <div id="weight-components" class="mb-4"></div>
+
+            <div class="border-top pt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-medium">Total Weight:</span>
+                <div class="d-flex align-items-center gap-2">
+                  <i id="totalIcon" class="bi"></i>
+                  <span id="totalDisplay" class="fw-bold"></span>
+                </div>
+              </div>
+              <div id="totalError" class="text-danger small mt-2 d-none">
+                Weights must total 100%
+                <button type="button" class="btn btn-link btn-sm p-0" onclick="normalizeWeights()">Auto-normalize</button>
+              </div>
+              <div id="adjustingNotice" class="text-primary small mt-2 d-none">
+                <span class="spinner-grow spinner-grow-sm"></span> Updating weights...
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden input to store weights -->
+          <input type="hidden" id="scoring_weights" name="scoring_weights" value="">
+        </div> 
+
+        <div class="modal-footer"> 
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i>
+            Post Job
+          </button> 
+        </div>
+      </form> 
+    </div> 
+  </div> 
+</div>
+
+<!-- Edit Job Modal -->
+<div class="modal fade modal-enhanced" id="editModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <form id="editJobForm" enctype="multipart/form-data" method="POST">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-pencil me-2"></i>
+            Edit Job
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Hidden Job ID -->
+          <input type="hidden" id="editJobId" name="job_id">
+
+          <!-- Upload Company Logo -->
+          <div class="mb-3">
+            <label for="editCompanyLogo" class="form-label">Upload Company Logo</label>
+            <input type="file" class="form-control" id="editCompanyLogo" name="company_logo" accept="image/*"/>
+            <div class="mt-2">
+              <img id="currentLogo" src="/static/images/logo2.png" alt="Company Logo" class="img-thumbnail" style="max-height:80px;">
+            </div>
+          </div>
+
+          <!-- Company Name -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="editCompany" name="company" placeholder="Enter Company Name" required>
+            <label for="editCompany">Company Name</label>
+          </div>
+
+          <!-- Job Profile -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="editProfile" name="jp" placeholder="Enter Job Profile" required>
+            <label for="editProfile">Job Profile</label>
+          </div>
+
+          <!-- Salary -->
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="editSalary" name="salary" placeholder="Enter Package">
+            <label for="editSalary">Salary Package</label>
+          </div>
+
+          <!-- Application Deadline -->
+          <div class="form-floating mb-3">
+            <input type="date" class="form-control" id="editLastDate" name="last_date" required>
+            <label for="editLastDate">Application Deadline</label>
+          </div>
+
+          <!-- Job Description File -->
+          <div class="mb-3">
+            <label for="editJD" class="form-label">Upload Job Description</label>
+            <input type="file" class="form-control" id="editJD" name="jd"/>
+            <div class="mt-2">
+              <a id="currentJDLink" href="#" target="_blank">No file uploaded</a>
+            </div>
+          </div>
+
+          <!-- Status -->
+          <div class="form-floating mb-3">
+            <select class="form-control" id="editStatus" name="status" required>
+              <option value="Open">Open</option>
+              <option value="Closed">Closed</option>
+            </select>
+            <label for="editStatus">Job Status</label>
+          </div>
+
+          <!-- Role Template Selection -->
+          <div class="mb-4">
+            <label for="editRoleTemplate" class="form-label">
+              <i class="bi bi-bookmark"></i> Role Template
+            </label>
+            <select class="form-select" id="editRoleTemplate" name="role_template" onchange="loadRoleTemplate('edit')">
+              <option value="custom">Custom Configuration</option>
+            </select>
+            <div class="form-text">Choose a template that matches your role requirements</div>
+          </div>
+
+          <!-- Scoring Weights Customizer -->
+          <!-- <div class="weight-customizer" id="edit-weight-customizer">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="d-flex align-items-center gap-3">
+                <div class="p-2 bg-primary rounded text-white">
+                  <i class="bi bi-sliders fs-5"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0">Scoring Weights</h5>
+                  <small class="text-muted">Customize the importance of each criteria</small>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1" onclick="resetWeights('edit')">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset
+              </button>
+            </div>
+
+            <div id="edit-template-description" class="alert alert-info d-none mb-4"></div>
+            <div id="edit-weight-components" class="mb-4"></div>
+
+            <div class="border-top pt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-medium">Total Weight:</span>
+                <div class="d-flex align-items-center gap-2">
+                  <i id="edit-totalIcon" class="bi"></i>
+                  <span id="edit-totalDisplay" class="fw-bold"></span>
+                </div>
+              </div>
+              <div id="edit-totalError" class="text-danger small mt-2 d-none">
+                Weights must total 100%
+                <button type="button" class="btn btn-link btn-sm p-0" onclick="normalizeWeights('edit')">Auto-normalize</button>
+              </div>
+              <div id="edit-adjustingNotice" class="text-primary small mt-2 d-none">
+                <span class="spinner-grow spinner-grow-sm"></span> Updating weights...
+              </div>
+            </div>
+          </div>
+
+           Hidden input for weights 
+          <input type="hidden" id="edit_scoring_weights" name="scoring_weights" value="">
+        </div> -->
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i>
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- View Candidates Modal -->
+<div class="modal fade modal-enhanced" id="view_candidates" tabindex="-1" aria-hidden="true"> 
+  <div class="modal-dialog modal-lg"> 
+    <div class="modal-content"> 
+      <div class="modal-header"> 
+        <h5 class="modal-title">
+          <i class="bi bi-people me-2"></i>
+          Applied Candidates
+        </h5> 
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button> 
+      </div> 
+      <div class="modal-body"> 
+        <table class="table table-striped table-responsive"> 
+          <thead> 
+            <tr> 
+              <th class="text-center">No.</th> 
+              <th class="text-center">Name</th> 
+              <th class="text-center">Matching %</th> 
+            </tr> 
+          </thead> 
+          <tbody id="data"></tbody> 
+        </table> 
+      </div> 
+    </div> 
+  </div> 
+</div>
+
+<!-- jQuery and other scripts -->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+// Weight customization system
+let roleTemplates = {};
+let localWeights = {
+  skills: 40,
+  experience: 30, 
+  education: 15,
+  certifications: 15
+};
+
+let editWeights = {
+  skills: 40,
+  experience: 30, 
+  education: 15,
+  certifications: 15
+};
+
+const weightComponents = [
+  { 
+    key: "skills", 
+    label: "Technical Skills", 
+    color: "primary", 
+    description: "Programming languages, tools, and technical expertise" 
+  },
+  { 
+    key: "experience", 
+    label: "Work Experience", 
+    color: "success", 
+    description: "Years of relevant professional experience" 
+  },
+  { 
+    key: "education", 
+    label: "Education", 
+    color: "info", 
+    description: "Degree level and field of study relevance" 
+  },
+  { 
+    key: "certifications", 
+    label: "Certifications", 
+    color: "warning", 
+    description: "Professional certifications and licenses" 
+  }
+];
+
+// Load role templates on page load
+$(document).ready(function() {
+  loadRoleTemplates();
+  renderWeights();
+  renderWeights('edit');
+});
+
+function loadRoleTemplates() {
+  $.get('/HR1/get_role_templates')
+    .done(function(response) {
+      if (response.success) {
+        roleTemplates = response.templates;
+        const select = $('#roleTemplate');
+        const editSelect = $('#editRoleTemplate');
+        
+        // Clear and populate options
+        select.empty().append('<option value="custom">Custom Configuration</option>');
+        editSelect.empty().append('<option value="custom">Custom Configuration</option>');
+        
+        Object.keys(roleTemplates).forEach(key => {
+          if (key !== 'custom') {
+            const template = roleTemplates[key];
+            select.append(`<option value="${key}">${template.name}</option>`);
+            editSelect.append(`<option value="${key}">${template.name}</option>`);
+          }
+        });
+      }
+    })
+    .fail(function() {
+      console.error('Failed to load role templates');
+    });
+}
+
+function loadRoleTemplate(mode = '') {
+  const selectedTemplate = mode === 'edit' ? $('#editRoleTemplate').val() : $('#roleTemplate').val();
+  const template = roleTemplates[selectedTemplate];
+  
+  if (template) {
+    if (mode === 'edit') {
+      editWeights = { ...template.weights };
+      renderWeights('edit');
+      showTemplateDescription(template, 'edit');
+    } else {
+      localWeights = { ...template.weights };
+      renderWeights();
+      showTemplateDescription(template);
+    }
+  }
+}
+
+function showTemplateDescription(template, mode = '') {
+  const prefix = mode === 'edit' ? 'edit-' : '';
+  const descDiv = $(`#${prefix}template-description`);
+  
+  if (template && template.description) {
+    descDiv.removeClass('d-none')
+           .html(`<strong>${template.name}:</strong> ${template.description}`);
+  } else {
+    descDiv.addClass('d-none');
+  }
+}
+
+function renderWeights(mode = '') {
+  const prefix = mode === 'edit' ? 'edit-' : '';
+  const container = document.getElementById(`${prefix}weight-components`);
+  const weights = mode === 'edit' ? editWeights : localWeights;
+  
+  container.innerHTML = "";
+
+  weightComponents.forEach(({ key, label, color, description }) => {
+    const value = weights[key];
+    const row = document.createElement("div");
+    row.className = "weight-component";
+
+    row.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div>
+          <span class="badge bg-${color} me-2">&nbsp;</span>
+          <strong>${label}</strong>
+          <div class="text-muted small">${description}</div>
+        </div>
+        <span class="fw-bold" id="${prefix}${key}-value">${value}%</span>
+      </div>
+      <input 
+        type="range" 
+        class="form-range" 
+        min="0" max="100" step="1"
+        value="${value}" 
+        data-key="${key}"
+        data-mode="${mode}"
+        oninput="handleWeightChange(this)"
+      />
+    `;
+    container.appendChild(row);
+  });
+
+  updateTotal(mode);
+}
+
+function handleWeightChange(slider) {
+  const key = slider.getAttribute("data-key");
+  const mode = slider.getAttribute("data-mode");
+  const prefix = mode === 'edit' ? 'edit-' : '';
+  let value = parseInt(slider.value, 10);
+
+  // Get current weights object
+  const weights = mode === 'edit' ? editWeights : localWeights;
+
+  // Calculate current total excluding this component
+  const currentTotal = Object.entries(weights)
+    .filter(([k]) => k !== key)
+    .reduce((a, [, v]) => a + v, 0);
+
+  // Prevent exceeding 100
+  if (currentTotal + value > 100) {
+    value = 100 - currentTotal;
+    slider.value = value;
+  }
+
+  // Update state
+  weights[key] = value;
+
+  // Update display
+  document.getElementById(`${prefix}${key}-value`).textContent = value + "%";
+  updateTotal(mode);
+
+  // Update hidden form field
+  const hiddenField = mode === 'edit' ? 'edit_scoring_weights' : 'scoring_weights';
+  document.getElementById(hiddenField).value = JSON.stringify(weights);
+
+  // Show adjusting notice briefly
+  const adjustingNotice = document.getElementById(`${prefix}adjustingNotice`);
+  adjustingNotice.classList.remove("d-none");
+  setTimeout(() => {
+    adjustingNotice.classList.add("d-none");
+  }, 500);
+}
+
+function updateTotal(mode = '') {
+  const prefix = mode === 'edit' ? 'edit-' : '';
+  const weights = mode === 'edit' ? editWeights : localWeights;
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  const isValid = Math.abs(total - 100) < 0.1;
+
+  const totalDisplay = document.getElementById(`${prefix}totalDisplay`);
+  const totalIcon = document.getElementById(`${prefix}totalIcon`);
+  const totalError = document.getElementById(`${prefix}totalError`);
+
+  totalDisplay.textContent = total.toFixed(1) + "%";
+  if (isValid) {
+    totalDisplay.className = "fw-bold text-success";
+    totalIcon.className = "bi bi-check-circle-fill text-success";
+    totalError.classList.add("d-none");
+  } else {
+    totalDisplay.className = "fw-bold text-danger";
+    totalIcon.className = "bi bi-exclamation-circle-fill text-danger";
+    totalError.classList.remove("d-none");
+  }
+  
+  // Update hidden form field
+  const hiddenField = mode === 'edit' ? 'edit_scoring_weights' : 'scoring_weights';
+  document.getElementById(hiddenField).value = JSON.stringify(weights);
+}
+
+function resetWeights(mode = '') {
+  const defaultWeights = { skills: 40, experience: 30, education: 15, certifications: 15 };
+  
+  if (mode === 'edit') {
+    editWeights = { ...defaultWeights };
+    $('#editRoleTemplate').val('custom');
+    $('#edit-template-description').addClass('d-none');
+  } else {
+    localWeights = { ...defaultWeights };
+    $('#roleTemplate').val('custom');
+    $('#template-description').addClass('d-none');
+  }
+  
+  renderWeights(mode);
+}
+
+function normalizeWeights(mode = '') {
+  const weights = mode === 'edit' ? editWeights : localWeights;
+  const total = Object.values(weights).reduce((a, b) => a + b, 0);
+  
+  if (total === 0) return;
+
+  const normalized = {};
+  for (let key in weights) {
+    normalized[key] = Math.round((weights[key] / total) * 100);
+  }
+  
+  if (mode === 'edit') {
+    editWeights = normalized;
+  } else {
+    localWeights = normalized;
+  }
+  
+  renderWeights(mode);
+}
+
+// Form validation before submission
+$('#jobPostForm').on('submit', function(e) {
+  const total = Object.values(localWeights).reduce((a, b) => a + b, 0);
+  
+  if (Math.abs(total - 100) > 0.1) {
+    e.preventDefault();
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Weights',
+      text: 'Scoring weights must total exactly 100%. Please adjust the weights or use auto-normalize.',
+      confirmButtonText: 'Fix Weights'
+    });
+    return false;
+  }
+  
+  // Ensure weights are stored
+  document.getElementById('scoring_weights').value = JSON.stringify(localWeights);
+});
+
+$('#editJobForm').on('submit', function(e) {
+  const total = Object.values(editWeights).reduce((a, b) => a + b, 0);
+  
+  if (Math.abs(total - 100) > 0.1) {
+    e.preventDefault();
+    Swal.fire({
+      icon: 'error',
+      title: 'Invalid Weights',
+      text: 'Scoring weights must total exactly 100%. Please adjust the weights or use auto-normalize.',
+      confirmButtonText: 'Fix Weights'
+    });
+    return false;
+  }
+});
+
+// Existing view candidates functionality
+$(document).on("click", ".view_candidates", function () { 
+  var job_id = $(this).attr("id"); 
+  $.ajax({
+    url: "/HR1/view_applied_candidates", 
+    method: "POST", 
+    data: { job_id: job_id }, 
+    success: function (resp) {
+      console.log("view_applied_candidates response:", resp); 
+      
+      if (resp && resp.StatusCode === 200) {
+        var candidates = resp.data || []; 
+        var strline = ""; 
+        
+        for (var i = 0; i < candidates.length; i++) {
+          var candidate = candidates[i]; 
+          var matchPercentage = candidate.Match; 
+          
+          if (matchPercentage === null || matchPercentage === undefined || isNaN(matchPercentage)) { 
+            matchPercentage = "N/A"; 
+          } else { 
+            matchPercentage = Number(matchPercentage).toFixed(2) + "%"; 
+          } 
+          
+          strline += "<tr><td class='text-center'>" + (i + 1) + "</td><td class='text-center'>" + (candidate.Name || "Unknown") + "</td><td class='text-center'>" + matchPercentage + "</td></tr>"; 
+        } 
+        document.getElementById("data").innerHTML = strline; 
+      } else { 
+        alert("Failed to fetch candidates"); 
+      } 
+    }, 
+    error: function (xhr, status, err) { 
+      console.error("AJAX error:", status, err); 
+      alert("Error fetching candidates"); 
+    } 
+  }); 
+});
+
+// Edit job functionality
+var editModal = document.getElementById('editModal');
+editModal.addEventListener('show.bs.modal', function (event) {
+  var button = event.relatedTarget;
+  
+  document.getElementById('editJobId').value = button.getAttribute('data-id');
+  document.getElementById('editProfile').value = button.getAttribute('data-profile');
+  document.getElementById('editCompany').value = button.getAttribute('data-company');
+  document.getElementById('editSalary').value = button.getAttribute('data-salary');
+  document.getElementById('editLastDate').value = button.getAttribute('data-lastdate');
+  document.getElementById('editStatus').value = button.getAttribute('data-status');
+
+  // Handle logo
+  let logo = button.getAttribute('data-logo');
+  document.getElementById('currentLogo').src = logo ? 
+    `/static/company_logos/${logo}` : 
+    `/static/images/logo2.png`;
+
+  // Handle JD file
+  let jdFile = button.getAttribute('data-jdfile');
+  let jdLink = document.getElementById('currentJDLink');
+  if (jdFile) {
+    jdLink.href = `/static/Job_Description/${button.getAttribute('data-id')}/${jdFile}`;
+    jdLink.textContent = jdFile;
+  } else {
+    jdLink.textContent = "No file uploaded";
+    jdLink.removeAttribute("href");
+  }
+
+  // Handle weights and template
+  const weightsData = button.getAttribute('data-weights');
+  const templateData = button.getAttribute('data-template');
+  
+  try {
+    if (weightsData && weightsData !== '{}') {
+      const weights = JSON.parse(weightsData);
+      editWeights = { ...weights };
+    } else {
+      editWeights = { skills: 40, experience: 30, education: 15, certifications: 15 };
+    }
+    
+    if (templateData && templateData !== 'custom') {
+      $('#editRoleTemplate').val(templateData);
+      const template = roleTemplates[templateData];
+      if (template) {
+        showTemplateDescription(template, 'edit');
+      }
+    } else {
+      $('#editRoleTemplate').val('custom');
+      $('#edit-template-description').addClass('d-none');
+    }
+    
+    renderWeights('edit');
+  } catch (e) {
+    console.error('Error parsing weights:', e);
+    editWeights = { skills: 40, experience: 30, education: 15, certifications: 15 };
+    renderWeights('edit');
+  }
+});
+
+// Update job form submission
+$(document).on("submit", "#editJobForm", function(e) {
+  e.preventDefault();
+
+  let formData = new FormData(this);
+  
+  // Ensure edit weights are stored
+  document.getElementById('edit_scoring_weights').value = JSON.stringify(editWeights);
+
+  $.ajax({
+    url: "/HR1/update_job",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function(response) {
+      if (response.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Updated successfully!",
+          showConfirmButton: false,
+          timer: 1500
+        }).then(() => {
+          location.reload();
+        });
+      } else {
+        Swal.fire("Error", response.message, "error");
+      }
+    },
+    error: function() {
+      Swal.fire("Error", "Something went wrong!", "error");
+    }
+  });
+});
+
+// Delete job functionality
+$(document).on("click", ".delete-job", function() {
+  let jobId = $(this).data("id");
+  
+  Swal.fire({
+    title: "Are you sure?",
+    text: "This job will be permanently deleted!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#6c757d",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
+    if (result.isConfirmed) {
+      $.ajax({
+        url: "/HR1/delete_job",
+        type: "POST",
+        data: { job_id: jobId },
+        success: function(response) {
+          if (response.success) {
+            Swal.fire({
+              icon: "success",
+              title: "Deleted!",
+              text: "Job deleted successfully.",
+              showConfirmButton: false,
+              timer: 1500
+            }).then(() => {
+              location.reload();
+            });
+          } else {
+            Swal.fire("Error", response.message, "error");
+          }
+        },
+        error: function() {
+          Swal.fire("Error", "Something went wrong!", "error");
+        }
+      });
+    }
+  });
+});
+
+// Search and filter functionality
+$(function () {
+  const $container = $(".jobs-container");
+
+  function parseDate(val) {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? new Date(0) : d;
+  }
+
+  function parseSalary(val) {
+    const num = parseFloat(String(val).replace(/[^0-9.]/g, ""));
+    return isNaN(num) ? 0 : num;
+  }
+
+  function filterJobs() {
+    const searchText = ($("#jobSearch").val() || "").toLowerCase().trim();
+    const status = $("#statusFilter").val();
+    const sortOption = $("#sortOption").val();
+
+    // Filter: show/hide cards
+    $container.children(".job-card").each(function () {
+      const $card = $(this);
+      const title = ($card.find(".job-title").text() || "").toLowerCase();
+      const company = (String($card.data("company")) || "").toLowerCase();
+      const jobStatus = String($card.data("status") || "").trim();
+
+      const matchesSearch = !searchText || title.includes(searchText) || company.includes(searchText);
+      const matchesStatus = !status || jobStatus === status;
+
+      $card.toggle(matchesSearch && matchesStatus);
+    });
+
+    // Sort: work with a plain array of elements
+    const cards = $container.children(".job-card").get();
+
+    cards.sort(function (a, b) {
+      const $a = $(a), $b = $(b);
+
+      if (sortOption === "newest") {
+        return parseDate($b.data("created")) - parseDate($a.data("created"));
+      } else if (sortOption === "oldest") {
+        return parseDate($a.data("created")) - parseDate($b.data("created"));
+      } else if (sortOption === "salary_high") {
+        return parseSalary($b.data("salary")) - parseSalary($a.data("salary"));
+      } else if (sortOption === "salary_low") {
+        return parseSalary($a.data("salary")) - parseSalary($b.data("salary"));
+      }
+      return 0;
+    });
+
+    $container.empty().append(cards);
+  }
+
+  $("#jobSearch, #statusFilter, #sortOption").on("input change", filterJobs);
+  filterJobs();
+});
+</script>
+
+{% endblock %}

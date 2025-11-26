@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}Application Status{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background: #fafafa;
+    }
+    .status-container {
+        max-width: 900px;
+        margin: 50px auto;
+        padding: 20px;
+    }
+    .status-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+    .status-header {
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    .status-content {
+        padding: 30px;
+    }
+    .progress-bar-custom {
+        height: 8px;
+        background: #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+    .progress-fill {
+        height: 100%;
+        background: {{ status_info.color }};
+        transition: width 0.5s ease;
+    }
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .info-section {
+        background: #f9fafb;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    .info-label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+    .info-value {
+        color: #1f2937;
+        font-weight: 600;
+    }
+    .interview-card {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+    }
+    .match-score-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: #dcfce7;
+        color: #166534;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="status-container">
+    <div class="status-card">
+        <div class="status-header">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <h2 class="mb-2">{{ job.title }}</h2>
+                    <p class="mb-0 opacity-90">{{ company_name }}</p>
+                    {% if match_score > 0 %}
+                    <div class="mt-2">
+                        <span class="match-score-badge">
+                            <i class="bi bi-stars"></i>
+                            {{ match_score }}% Match
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="status-badge">
+                    <i class="bi bi-{{ status_info.icon }}"></i>
+                    {{ status_info.label }}
+                </div>
+            </div>
+            
+            <div class="progress-bar-custom">
+                <div class="progress-fill" style="width: {{ status_info.progress }}%;"></div>
+            </div>
+            <p class="mb-0 mt-2 opacity-90">{{ status_info.description }}</p>
+        </div>
+        
+        <div class="status-content">
+            <h5 class="mb-3">Application Details</h5>
+            <div class="info-section">
+                <div class="info-row">
+                    <span class="info-label">Applied On</span>
+                    <span class="info-value">{{ applied_date }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Current Status</span>
+                    <span class="info-value">{{ status_info.label }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Resume Used</span>
+                    <span class="info-value">{{ resume_title }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Job Type</span>
+                    <span class="info-value">{{ job.job_type }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Location</span>
+                    <span class="info-value">{{ job.location }}</span>
+                </div>
+                {% if job.salary %}
+                <div class="info-row">
+                    <span class="info-label">Salary</span>
+                    <span class="info-value">{{ job.salary }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if interview %}
+            <h5 class="mb-3 mt-4">Interview Details</h5>
+            <div class="interview-card">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <i class="bi bi-calendar-event" style="font-size: 1.5rem; color: #f59e0b;"></i>
+                    <div>
+                        {% if interview.interview_date %}
+                        <strong>{{ interview.interview_date.strftime('%B %d, %Y') if interview.interview_date is datetime else interview.interview_date }}</strong>
+                        {% if interview.interview_time %}
+                        <div class="text-muted">{{ interview.interview_time }}</div>
+                        {% endif %}
+                        {% else %}
+                        <strong>Interview Scheduled</strong>
+                        <div class="text-muted">Details will be shared soon</div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if interview.interview_type %}
+                <p class="mb-0 mt-2">
+                    <strong>Type:</strong> {{ interview.interview_type|title }}
+                </p>
+                {% endif %}
+                {% if interview.notes %}
+                <p class="mb-0 mt-2">
+                    <strong>Notes:</strong> {{ interview.notes }}
+                </p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="mt-4">
+                <a href="/notifications" class="btn btn-secondary me-2">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Notifications
+                </a>
+                <a href="/my_applications" class="btn btn-primary me-2">
+                    <i class="bi bi-list-check me-2"></i>All Applications
+                </a>
+                <a href="/HR1/show_job" class="btn btn-outline-primary">
+                    <i class="bi bi-briefcase me-2"></i>Browse More Jobs
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

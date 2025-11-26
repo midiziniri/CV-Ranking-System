@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+{% block body_class %}how-it-works-page{% endblock %}
+{% block title %}How It Works - Resume Ranking System{% endblock %}
+
+{% block styleInclude %}
+<style>
+  .how-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 8rem 0 4rem;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .how-hero::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+    background-size: cover;
+  }
+
+  .how-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .how-hero p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Process Section */
+  .process-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .section-title {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .section-title h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .section-title p {
+    font-size: 1.2rem;
+    color: #6b7280;
+  }
+
+  .process-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    background: white;
+    border: 2px solid #e5e7eb;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .tab-btn:hover {
+    border-color: #667eea;
+    color: #667eea;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .step-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .step-item {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 4rem;
+    align-items: flex-start;
+  }
+
+  .step-item:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  .step-number {
+    min-width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 800;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .step-content p {
+    color: #6b7280;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  .step-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+  }
+
+  .step-features li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .step-features li i {
+    color: #10b981;
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 5rem 0;
+    text-align: center;
+    color: white;
+  }
+
+  .cta-section h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .cta-section p {
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.95;
+  }
+
+  .cta-btn {
+    background: white;
+    color: #667eea;
+    padding: 1.2rem 3rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.3rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    color: #667eea;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .how-hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .how-hero p {
+      font-size: 1.1rem;
+      padding: 0 1rem;
+    }
+
+    .section-title h2 {
+      font-size: 2.5rem;
+    }
+
+    .step-item,
+    .step-item:nth-child(even) {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .step-number {
+      margin: 0 auto;
+    }
+
+    .step-features {
+      text-align: left;
+    }
+
+    .cta-section h2 {
+      font-size: 2.5rem;
+    }
+
+    .cta-section p {
+      font-size: 1.1rem;
+      padding: 0 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="how-hero">
+  <div class="container">
+    <h1>How Hirearchy Works</h1>
+    <p>Discover how our intelligent platform connects the right talent with the right opportunities in just a few simple steps.</p>
+  </div>
+</section>
+
+<!-- Process Section -->
+<section class="process-section">
+  <div class="container">
+    <div class="section-title">
+      <h2>Simple, Powerful, Effective</h2>
+      <p>Choose your role to see how Hirearchy can help you</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="process-tabs">
+      <button class="tab-btn active" onclick="switchTab('jobseeker')">
+        <i class="fas fa-user-graduate me-2"></i>For Job Seekers
+      </button>
+      <button class="tab-btn" onclick="switchTab('employer')">
+        <i class="fas fa-briefcase me-2"></i>For Employers
+      </button>
+    </div>
+
+    <!-- Job Seeker Content -->
+    <div id="jobseeker" class="tab-content active">
+      <div class="step-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Create Your Profile</h3>
+            <p>Sign up and build your professional profile in minutes. Upload your resume, add your skills, experience, and career preferences.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Easy registration process</li>
+              <li><i class="fas fa-check-circle"></i> Resume upload and parsing</li>
+              <li><i class="fas fa-check-circle"></i> Skill highlighting</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Browse & Apply to Jobs</h3>
+            <p>Explore thousands of job opportunities matched to your profile. Our AI recommends the best fits based on your skills and preferences.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Personalized job recommendations</li>
+              <li><i class="fas fa-check-circle"></i> Advanced search filters</li>
+              <li><i class="fas fa-check-circle"></i> One-click applications</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Track Your Applications</h3>
+            <p>Monitor all your applications in one place. Get real-time updates on your application status and interview schedules.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Application dashboard</li>
+              <li><i class="fas fa-check-circle"></i> Status notifications</li>
+              <li><i class="fas fa-check-circle"></i> Interview reminders</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Land Your Dream Job</h3>
+            <p>Get matched with employers who value your skills. Prepare for interviews with our resources and receive offers faster.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Interview preparation tips</li>
+              <li><i class="fas fa-check-circle"></i> Direct employer communication</li>
+              <li><i class="fas fa-check-circle"></i> Career guidance resources</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employer Content -->
+    <div id="employer" class="tab-content">
+      <div class="step-container">
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Post Your Job Opening</h3>
+            <p>Create detailed job postings in minutes. Specify requirements, responsibilities, and company culture to attract the right candidates.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Quick job posting form</li>
+              <li><i class="fas fa-check-circle"></i> Rich text descriptions</li>
+              <li><i class="fas fa-check-circle"></i> Skill requirement tagging</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>AI-Powered Candidate Ranking</h3>
+            <p>Our intelligent system analyzes all applications and ranks candidates based on their match with your requirements. Save hours of manual screening.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Automated resume parsing</li>
+              <li><i class="fas fa-check-circle"></i> Skill matching algorithm</li>
+              <li><i class="fas fa-check-circle"></i> Smart ranking system</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Review & Shortlist</h3>
+            <p>Browse top-ranked candidates with detailed profiles. Filter, compare, and collaborate with your team to identify the best fits.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Detailed candidate profiles</li>
+              <li><i class="fas fa-check-circle"></i> Team collaboration tools</li>
+              <li><i class="fas fa-check-circle"></i> Advanced filtering options</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Schedule & Hire</h3>
+            <p>Connect with candidates directly, schedule interviews, and make offers all within the platform. Track your entire hiring pipeline effortlessly.</p>
+            <ul class="step-features">
+              <li><i class="fas fa-check-circle"></i> Integrated messaging system</li>
+              <li><i class="fas fa-check-circle"></i> Interview scheduling</li>
+              <li><i class="fas fa-check-circle"></i> Hiring analytics dashboard</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2>Ready to Get Started?</h2>
+    <p>Join thousands of professionals who trust Hirearchy to connect talent with opportunity</p>
+    <a href="/#registration" class="cta-btn">
+      <i class="fas fa-rocket me-2"></i>Start Now - It's Free
+    </a>
+  </div>
+</section>
+
+<script>
+  function switchTab(tabName) {
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+
+    // Show selected tab content
+    document.getElementById(tabName).classList.add('active');
+
+    // Add active class to clicked button
+    event.target.closest('.tab-btn').classList.add('active');
+  }
+</script>
+{% endblock %}

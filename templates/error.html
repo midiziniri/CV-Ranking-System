@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error {{error_code}}</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .error-container { max-width: 500px; margin: 0 auto; }
+        .error-code { font-size: 72px; color: #dc3545; font-weight: bold; }
+        .error-message { font-size: 18px; color: #6c757d; margin: 20px 0; }
+        .back-link { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">{{error_code}}</div>
+        <div class="error-message">{{error_message}}</div>
+        <a href="/" class="back-link">← Back to Home</a>
+    </div>
+</body>
+</html>

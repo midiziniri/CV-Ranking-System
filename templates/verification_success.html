@@ -1,0 +1,75 @@
+<!-- verification_success.html -->
+{% extends "base.html" %}
+{% block title %}Email Verified Successfully{% endblock %}
+
+{% block styleInclude %}
+<style>
+.success-container {
+    max-width: 500px;
+    margin: 3rem auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+    color: #4CAF50;
+    margin-bottom: 1rem;
+}
+
+.success-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.success-text {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        
+        <h1 class="success-title">Email Verified!</h1>
+        
+        <div class="success-text">
+            <p>Your email has been successfully verified.</p>
+            <p>You can now log in to your 
+            {% if user_type == 'applicant' %}job seeker{% else %}HR{% endif %} account and start 
+            {% if user_type == 'applicant' %}applying for jobs{% else %}posting jobs and finding candidates{% endif %}.</p>
+        </div>
+        
+        <a href="{{ url_for('loginpage') }}" class="btn btn-primary">Login to Your Account</a>
+    </div>
+</main>
+{% endblock %}

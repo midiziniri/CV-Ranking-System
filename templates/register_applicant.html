@@ -1,0 +1,351 @@
+<!--register_applicant.html - Enhanced with relevant fields and email verification-->
+{% extends "base.html" %}
+{% block title %}Job Seeker Registration{% endblock %}
+
+{% block styleInclude %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<style>
+.registration-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.registration-header {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.registration-header h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-container {
+    padding: 2rem;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #4CAF50;
+    display: inline-block;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.required {
+    color: #e74c3c;
+}
+
+.optional {
+    color: #666;
+    font-weight: normal;
+    font-size: 0.9em;
+}
+
+.form-group input, 
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus, 
+.form-group select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.form-group small {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.submit-btn {
+    background: linear-gradient(135deg, #4CAF50, #45a049);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+}
+
+.back-link a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.flash-message.error {
+    background-color: #fee;
+    color: #c33;
+    border: 1px solid #fcc;
+}
+
+.flash-message.success {
+    background-color: #efe;
+    color: #363;
+    border: 1px solid #cfc;
+}
+
+.verification-notice {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .registration-container {
+        margin: 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="registration-container">
+        <div class="registration-header">
+            <h1>Job Seeker Registration</h1>
+            <p>Create your account to discover opportunities</p>
+        </div>
+        
+        <div class="form-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="verification-notice">
+                <strong>Email Verification Required:</strong> After registration, you'll receive a verification email. Please check your inbox and click the verification link to activate your account.
+            </div>
+            
+            <form action="{{ url_for('signup_applicant') }}" method="POST" id="applicantRegistrationForm">
+
+
+                <!-- Personal Information -->
+                <div class="form-section">
+                    <div class="section-title">Personal Information</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="full_name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="full_name" name="full_name" required
+                                   value="{{ request.form.get('full_name', '') if request.method == 'POST' else '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" required
+                                   value="{{ request.form.get('email', '') if request.method == 'POST' else '' }}">
+                        </div>
+                    </div>
+                    
+                    <!-- <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone_number">Phone Number <span class="optional">(Optional)</span></label>
+                            <input type="tel" id="phone_number" name="phone_number"
+                                   value="{{ request.form.get('phone_number', '') if request.method == 'POST' else '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Current Location <span class="optional">(Optional)</span></label>
+                            <input type="text" id="location" name="location" placeholder="City, Country"
+                                   value="{{ request.form.get('location', '') if request.method == 'POST' else '' }}">
+                            <small>This helps employers find local candidates</small>
+                        </div>
+                    </div>
+                </div>
+                
+                 Professional Information 
+                <div class="form-section">
+                    <div class="section-title">Professional Background</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="current_title">Current/Most Recent Job Title <span class="optional">(Optional)</span></label>
+                            <input type="text" id="current_title" name="current_title" placeholder="e.g., Software Developer, Marketing Manager"
+                                   value="{{ request.form.get('current_title', '') if request.method == 'POST' else '' }}">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="experience_level">Experience Level <span class="optional">(Optional)</span></label>
+                            <select id="experience_level" name="experience_level">
+                                <option value="">Select experience level</option>
+                                <option value="entry">Entry Level (0-2 years)</option>
+                                <option value="mid">Mid Level (3-5 years)</option>
+                                <option value="senior">Senior Level (6-10 years)</option>
+                                <option value="lead">Lead/Principal (10+ years)</option>
+                                <option value="executive">Executive/C-Level</option>
+                                <option value="student">Student/Intern</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="industry_preference">Preferred Industry <span class="optional">(Optional)</span></label>
+                            <select id="industry_preference" name="industry_preference">
+                                <option value="">Select preferred industry</option>
+                                <option value="Technology">Technology</option>
+                                <option value="Healthcare">Healthcare</option>
+                                <option value="Finance">Finance & Banking</option>
+                                <option value="Education">Education</option>
+                                <option value="Manufacturing">Manufacturing</option>
+                                <option value="Retail">Retail</option>
+                                <option value="Consulting">Consulting</option>
+                                <option value="Real Estate">Real Estate</option>
+                                <option value="Media">Media & Entertainment</option>
+                                <option value="Non-profit">Non-profit</option>
+                                <option value="Government">Government</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="linkedin_profile">LinkedIn Profile <span class="optional">(Optional)</span></label>
+                            <input type="url" id="linkedin_profile" name="linkedin_profile" placeholder="https://linkedin.com/in/yourprofile"
+                                   value="{{ request.form.get('linkedin_profile', '') if request.method == 'POST' else '' }}">
+                            <small>Helps employers learn more about your background</small>
+                        </div>
+                    </div>
+                </div>
+                 -->
+                <!-- Account Security -->
+                <div class="form-section">
+                    <div class="section-title">Account Security</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Password <span class="required">*</span></label>
+                            <input type="password" id="password" name="password" required>
+                            <small>At least 6 characters, include letters and numbers</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirm_password">Confirm Password <span class="required">*</span></label>
+                            <input type="password" id="confirm_password" name="confirm_password" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hidden role field -->
+                <input type="hidden" name="role" value="applicant">
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Create Account & Send Verification Email
+                </button>
+            </form>
+            
+            <div class="back-link">
+                <a href="{{ url_for('index') }}">← Back to Home</a> | 
+                <a href="{{ url_for('loginpage') }}">Already have an account? Sign In</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+document.getElementById('applicantRegistrationForm').addEventListener('submit', function() {
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'Creating Account...';
+});
+
+// Validate password match
+document.getElementById('confirm_password').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    
+    if (password !== confirmPassword) {
+        this.setCustomValidity('Passwords do not match');
+    } else {
+        this.setCustomValidity('');
+    }
+});
+</script>
+{% endblock %}

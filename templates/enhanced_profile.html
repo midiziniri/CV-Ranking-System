@@ -1,0 +1,1113 @@
+{% extends "base.html" %}
+{% block title %}My Profile & Documents{% endblock %}
+
+{% block content %}
+<style>
+.container-fluid {
+    padding: 2rem;
+    background: #fafafa;
+    margin: 0;
+    min-height: 100vh;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.profile-upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #10b981;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: white;
+    font-size: 14px;
+}
+
+.content-section {
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2563eb, #1e3a8a);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+.btn-danger {
+    background: #ef4444;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    color: white;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.upload-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 1rem;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-zone:hover {
+    border-color: #9ca3af;
+    background: #f9fafb;
+}
+
+.upload-zone.dragover {
+    border-color: #60a5fa;
+    background: #f0f9ff;
+}
+
+.document-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.document-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.document-card:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    transform: translateY(-2px);
+}
+
+.document-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.doc-pdf { background: #ef4444; }
+.doc-jpg, .doc-jpeg, .doc-png { background: #10b981; }
+.doc-doc, .doc-docx { background: #2563eb; }
+.doc-default { background: #6b7280; }
+
+.document-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.document-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.document-category {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #f3f4f6;
+    color: #374151;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.category-certification { background: #fef3c7; color: #92400e; }
+.category-achievement { background: #dcfce7; color: #166534; }
+.category-portfolio { background: #e0f2fe; color: #0369a1; }
+.category-transcript { background: #f3e8ff; color: #7c2d12; }
+.category-recommendation { background: #fce7f3; color: #be185d; }
+
+.document-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.resume-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.resume-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.resume-info {
+    flex: 1;
+}
+
+.resume-title {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.resume-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.resume-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-right: 0.25rem;
+}
+
+.badge-primary { background: #dbeafe; color: #1e40af; }
+.badge-success { background: #dcfce7; color: #166534; }
+.badge-info { background: #e0f2fe; color: #0369a1; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 2rem;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    color: #ffffff;
+    border-bottom-color: #3b82f6;
+}
+
+.tab:hover {
+    color: #bfd8ff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    margin-top: 7rem;
+}
+
+.modal-backdrop {
+    z-index: 0;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    border-radius: 1rem 1rem 0 0;
+    border-bottom: none;
+}
+
+.category-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #10b981);
+    border-radius: 0.5rem;
+    transition: width 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+    
+    .profile-header {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .content-section {
+        padding: 1.5rem;
+    }
+    
+    .document-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs {
+        flex-wrap: wrap;
+    }
+    
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        min-width: 120px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: start;
+        gap: 1rem;
+    }
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="position-relative">
+                    <img src="{{ user_profile.ProfilePicture or '/static/images/default-avatar.jpg' }}" 
+                         alt="Profile Picture" 
+                         class="profile-avatar"
+                         id="profileImage"
+                         onerror="this.src='/static/images/default-avatar.png'">
+                    <label for="profilePictureInput" class="profile-upload-btn" title="Change Profile Picture">
+                        <i class="bi bi-camera"></i>
+                    </label>
+                    <input type="file" 
+                           id="profilePictureInput" 
+                           accept="image/*" 
+                           style="display: none;"
+                           onchange="uploadProfilePicture(this)">
+                </div>
+            </div>
+            <div class="col">
+                <h2 class="mb-2">{{ user_profile.Name or session['user_name'] or 'Your Name' }}</h2>
+                <p class="mb-1 opacity-90">{{ user_profile.CurrentTitle or 'Add your professional title' }}</p>
+                <p class="mb-0 opacity-75">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    {{ user_profile.Location or 'Add your location' }}
+                </p>
+            </div>
+            <!-- <div class="col-auto">
+                <div class="text-end">
+                    <div class="h4 mb-1">{{ profile_completion or 0 }}%</div>
+                    <div class="small opacity-75">Profile Complete</div>
+                    <div class="progress-bar">
+    <div class="completion-bar" style="--progress: {{ profile_completion }}%;">
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+
+    <!-- Status Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'success' if category == 'success' else 'danger' if category == 'error' else 'info' }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('profile')">
+            <i class="bi bi-person-circle me-2"></i>Profile Information
+        </div>
+        <div class="tab" onclick="switchTab('documents')">
+            <i class="bi bi-folder me-2"></i>Document Portfolio
+        </div>
+        <div class="tab" onclick="switchTab('resumes')">
+            <i class="bi bi-file-earmark-text me-2"></i>Resumes
+        </div>
+    </div>
+
+    <!-- Profile Information Tab -->
+    <div id="profile-tab" class="tab-content active">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Personal Information</h5>
+                <button class="btn-primary" onclick="toggleEditMode()" id="editModeBtn">
+                    <i class="bi bi-pencil me-2"></i>
+                    <span id="editBtnText">Edit Profile</span>
+                </button>
+            </div>
+
+            <form id="profileForm" method="POST" action="/update_profile">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" name="full_name" class="form-control" 
+                                   value="{{ user_profile.Name or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" 
+                                   value="{{ user_profile.Email or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" name="phone_number" class="form-control" 
+                                   value="{{ user_profile.PhoneNumber or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Location</label>
+                            <input type="text" name="location" class="form-control" 
+                                   value="{{ user_profile.Location or '' }}" readonly>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="form-label">Professional Title</label>
+                            <input type="text" name="current_title" class="form-control" 
+                                   value="{{ user_profile.CurrentTitle or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Experience Level</label>
+                            <select name="experience_level" class="form-control" disabled>
+                                <option value="">Select Experience Level</option>
+                                <option value="entry" {{ 'selected' if user_profile.ExperienceLevel == 'entry' }}>Entry Level (0-2 years)</option>
+                                <option value="junior" {{ 'selected' if user_profile.ExperienceLevel == 'junior' }}>Junior (2-4 years)</option>
+                                <option value="mid" {{ 'selected' if user_profile.ExperienceLevel == 'mid' }}>Mid Level (4-7 years)</option>
+                                <option value="senior" {{ 'selected' if user_profile.ExperienceLevel == 'senior' }}>Senior (7+ years)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Industry Preference</label>
+                            <input type="text" name="industry_preference" class="form-control" 
+                                   value="{{ user_profile.IndustryPreference or '' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn Profile</label>
+                            <input type="url" name="linkedin_profile" class="form-control" 
+                                   value="{{ user_profile.LinkedInProfile or '' }}" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Professional Summary</label>
+                    <textarea name="professional_summary" class="form-control" rows="4" readonly>{{ user_profile.ProfessionalSummary or '' }}</textarea>
+                </div>
+
+                <div id="saveButtons" style="display: none;">
+                    <button type="submit" class="btn-primary me-2">
+                        <i class="bi bi-check-circle me-2"></i>Save Changes
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="cancelEdit()">
+                        <i class="bi bi-x-circle me-2"></i>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Document Portfolio Tab in Applicant Side -->
+    <div id="documents-tab" class="tab-content">
+        <div class="content-section">
+            <div class="section-header">
+                <h5 class="section-title">Document Portfolio</h5>
+                <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                </button>
+            </div>
+
+            <div class="upload-zone" onclick="document.getElementById('quickUploadInput').click()">
+                <div class="upload-icon mb-3">
+                    <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #9ca3af;"></i>
+                </div>
+                <h6 class="mb-2">Quick Upload</h6>
+                <p class="text-muted mb-0">Drag & drop files here or click to browse</p>
+                <small class="text-muted">Supported: PDF, JPG, PNG, DOC, DOCX</small>
+                <input type="file" id="quickUploadInput" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" 
+                       style="display: none;" onchange="quickUploadDocuments(this)">
+            </div>
+
+            <!-- Document Categories Filter -->
+            <div class="mt-4 mb-3">
+                <label class="form-label">Filter by Category:</label>
+                <select id="categoryFilter" class="form-control" style="width: auto; display: inline-block;" 
+                        onchange="filterDocuments()">
+                    <option value="">All Documents</option>
+                    <option value="certification">Certifications</option>
+                    <option value="achievement">Achievements</option>
+                    <option value="portfolio">Portfolio</option>
+                    <option value="transcript">Transcripts</option>
+                    <option value="recommendation">Recommendation Letters</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <!-- Documents Grid -->
+            <div class="document-grid" id="documentsGrid">
+                {% if user_documents %}
+                    {% for doc in user_documents %}
+                    <div class="document-card" data-category="{{ doc.Category }}">
+                        <div class="document-icon {{ doc.FileExtension|file_icon }}">
+                            <i class="bi bi-file-earmark"></i>
+                        </div>
+                        <div class="document-title">{{ doc.DocumentName }}</div>
+                        <div class="document-meta">
+                            Uploaded {{ doc.UploadedAt.strftime('%b %d, %Y') if doc.UploadedAt else 'Recently' }}
+                        </div>
+                        <div class="document-category category-{{ doc.Category }}">{{ doc.Category|title }}</div>
+                        {% if doc.Description %}
+                        <p class="text-muted small mb-2">{{ doc.Description }}</p>
+                        {% endif %}
+                        <div class="document-actions">
+                            <button class="btn-secondary" onclick="viewDocument('{{ doc._id }}')">
+                                <i class="bi bi-eye me-1"></i>View
+                            </button>
+                            <button class="btn-danger" onclick="deleteDocument('{{ doc._id }}')">
+                                <i class="bi bi-trash me-1"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state col-12">
+                        <div class="empty-icon">📄</div>
+                        <h6>No documents uploaded yet</h6>
+                        <p>Upload your certifications, achievements, and other documents to enhance your applications.</p>
+                        <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#uploadDocumentModal">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload First Document
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+ <!-- Resumes Tab -->
+    <!-- Resumes Tab -->
+<!-- Add this inside your Resumes Tab section in profile.html -->
+<!-- Replace the existing "Upload Resume" button section with this: -->
+
+<div id="resumes-tab" class="tab-content">
+    <div class="content-section">
+        <div class="section-header">
+            <h5 class="section-title">My Resumes</h5>
+            <div class="d-flex gap-2">
+                <!-- NEW: Resume Builder Button -->
+                <a href="/resume_builder" class="btn-primary" style="text-decoration: none;">
+                    <i class="bi bi-pencil-square me-2"></i>Build Resume
+                </a>
+                <!-- Existing Upload Button -->
+                <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#uploadResumeModal">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Resume
+                </button>
+            </div>
+        </div>
+
+        <!-- Add this info box before the resumes list -->
+        <div class="alert-info mb-4" style="background: #e0f2fe; border: 1px solid #0ea5e9; border-radius: 0.5rem; padding: 1rem;">
+            <div class="d-flex align-items-start gap-3">
+                <i class="bi bi-info-circle text-primary" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h6 class="mb-2" style="color: #0369a1; font-weight: 600;">Two Ways to Add Your Resume:</h6>
+                    <ul class="mb-0" style="color: #075985; font-size: 0.9rem; line-height: 1.6;">
+                        <li><strong>Build Resume:</strong> Use our interactive form to create a professional, standardized resume. Perfect for ensuring all information is captured correctly by our AI matching system.</li>
+                        <li><strong>Upload Resume:</strong> Upload an existing PDF or DOCX resume. Our AI will extract skills, experience, and qualifications automatically.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        {% if resumes %}
+            {% for resume in resumes %}
+            <div class="resume-item" onclick="toggleResumeDetails('{{ resume._id }}')" style="cursor: pointer;">
+                <div class="resume-info">
+                    <div class="resume-title">{{ resume.ResumeTitle or 'Untitled Resume' }}</div>
+                    <div class="resume-meta">
+                        Uploaded {{ resume.UploadedAt.strftime('%b %d, %Y') if resume.UploadedAt else 'Recently' }}
+                        {% if resume.ExtractionMethod %}
+                            | Processed with {{ resume.ExtractionMethod }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="resume-actions" onclick="event.stopPropagation();">
+                    <a class="btn btn-secondary"
+                       href="{{ url_for('static', filename='uploaded_resumes/' ~ (resume.InternalFilename or resume.ResumeTitle)) }}"
+                       target="_blank">
+                        <i class="bi bi-eye me-1"></i>View
+                    </a>
+                    <button class="btn-danger" onclick="deleteResume('{{ resume._id }}')">
+                        <i class="bi bi-trash me-1"></i>Delete
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📄</div>
+                <h6>No resumes uploaded yet</h6>
+                <p>Create a professional resume using our builder or upload your existing resume for AI-powered job matching.</p>
+                <div class="d-flex gap-3 justify-content-center mt-3">
+                    <a href="/resume_builder" class="btn-primary" style="text-decoration: none;">
+                        <i class="bi bi-pencil-square me-2"></i>Build Your Resume
+                    </a>
+                    <button class="btn-primary" data-bs-toggle="modal" data-bs-target="#uploadResumeModal">
+                        <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Resume
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</div>
+
+<!-- Upload Document Modal -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="documentUploadForm" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Document Name *</label>
+                        <input type="text" name="document_name" class="form-control" required
+                               placeholder="e.g., AWS Cloud Certification">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category *</label>
+                        <select name="category" class="category-select" required>
+                            <option value="">Select Category</option>
+                            <option value="certification">Certification</option>
+                            <option value="achievement">Achievement</option>
+                            <option value="portfolio">Portfolio Work</option>
+                            <option value="transcript">Academic Transcript</option>
+                            <option value="recommendation">Recommendation Letter</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea name="description" class="form-control" rows="3"
+                                  placeholder="Brief description of the document..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">File *</label>
+                        <input type="file" name="document_file" class="form-control" 
+                               accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" required>
+                        <small class="text-muted">Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 16MB)</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-primary" onclick="uploadDocument()">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload Document
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Resume Modal -->
+<div class="modal fade" id="uploadResumeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload Resume
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="resumeUploadForm" action="/uploadResume" method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label">Resume File *</label>
+                        <input type="file" name="resume" class="form-control" 
+                               accept=".pdf,.docx" required>
+                        <small class="text-muted">Supported formats: PDF, DOCX (Max 16MB)</small>
+                    </div>
+                  <!--  <div class="alert alert-info">
+                        <i class="bi bi-robot me-2"></i>
+                        <strong>AI-Powered Analysis:</strong> Our system will automatically extract skills, experience, 
+                        and qualifications from your resume for intelligent job matching.
+                    </div>-->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-primary" onclick="uploadResume()">
+                    <i class="bi bi-file-earmark-arrow-up me-2"></i>Upload 
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isEditMode = false;
+
+
+function toggleResumeDetails(resumeId) {
+    const detailsElement = document.getElementById(`details-${resumeId}`);
+    const resumeItem = detailsElement.closest('.resume-item');
+    const expandIndicator = resumeItem.querySelector('.expand-indicator i');
+    const expandText = resumeItem.querySelector('.expand-indicator small');
+    
+    if (detailsElement.style.display === 'none' || detailsElement.style.display === '') {
+        detailsElement.style.display = 'block';
+        resumeItem.classList.add('expanded');
+        expandIndicator.className = 'bi bi-chevron-up me-1';
+        expandText.innerHTML = '<i class="bi bi-chevron-up me-1"></i>Click to hide extracted information';
+    } else {
+        detailsElement.style.display = 'none';
+        resumeItem.classList.remove('expanded');
+        expandIndicator.className = 'bi bi-chevron-down me-1';
+        expandText.innerHTML = '<i class="bi bi-chevron-down me-1"></i>Click to view extracted information';
+    }
+}
+
+function switchTab(tabName) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all tabs
+    document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Show selected tab content
+    document.getElementById(tabName + '-tab').classList.add('active');
+    
+    // Add active class to clicked tab
+    event.target.classList.add('active');
+}
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const form = document.getElementById('profileForm');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    const editBtn = document.getElementById('editBtnText');
+    const saveButtons = document.getElementById('saveButtons');
+    
+    if (isEditMode) {
+        inputs.forEach(input => {
+            if (input.name !== 'email') { // Keep email readonly
+                input.removeAttribute('readonly');
+                input.removeAttribute('disabled');
+            }
+        });
+        editBtn.textContent = 'Cancel Edit';
+        saveButtons.style.display = 'block';
+    } else {
+        inputs.forEach(input => {
+            input.setAttribute('readonly', '');
+            if (input.tagName === 'SELECT') {
+                input.setAttribute('disabled', '');
+            }
+        });
+        editBtn.textContent = 'Edit Profile';
+        saveButtons.style.display = 'none';
+    }
+}
+
+function cancelEdit() {
+    location.reload(); // Simple way to reset form
+}
+
+function uploadProfilePicture(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+            showNotification('Image file too large. Maximum size is 5MB.', 'error');
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('profile_picture', file);
+        
+        // Show loading
+        showNotification('Uploading profile picture...', 'info');
+        
+        fetch('/upload_profile_picture', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('profileImage').src = data.image_url + '?t=' + Date.now();
+                showNotification('Profile picture updated successfully!', 'success');
+            } else {
+                showNotification(data.message || 'Failed to upload profile picture', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error uploading profile picture', 'error');
+        });
+    }
+}
+
+function quickUploadDocuments(input) {
+    if (input.files.length === 0) return;
+    
+    for (let file of input.files) {
+        // Basic validation
+        const allowedTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        
+        if (!allowedTypes.includes(fileExtension)) {
+            showNotification(`File type ${fileExtension} not supported`, 'error');
+            continue;
+        }
+        
+        if (file.size > 16 * 1024 * 1024) {
+            showNotification(`File ${file.name} too large (max 16MB)`, 'error');
+            continue;
+        }
+        
+        const formData = new FormData();
+        formData.append('document_file', file);
+        formData.append('document_name', file.name.split('.')[0]);
+        formData.append('category', 'other'); // Default category
+        formData.append('description', 'Quick uploaded document');
+        
+        uploadDocumentFile(formData, file.name);
+    }
+    
+    input.value = ''; // Clear input
+}
+
+function uploadDocument() {
+    const form = document.getElementById('documentUploadForm');
+    const formData = new FormData(form);
+    
+    // Validate required fields
+    if (!formData.get('document_name') || !formData.get('category') || !formData.get('document_file')) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    uploadDocumentFile(formData);
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('uploadDocumentModal'));
+    modal.hide();
+    
+    // Reset form
+    form.reset();
+}
+
+function uploadDocumentFile(formData, fileName = null) {
+    const docName = fileName || formData.get('document_name');
+    showNotification(`Uploading ${docName}...`, 'info');
+    
+    fetch('/upload_document', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Document uploaded successfully!', 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(data.message || 'Failed to upload document', 'error');
+        }
+    })
+    .catch(error => {
+        showNotification('Error uploading document', 'error');
+    });
+}
+
+function uploadResume() {
+    const form = document.getElementById('resumeUploadForm');
+    const formData = new FormData(form);
+    
+    if (!formData.get('resume')) {
+        showNotification('Please select a resume file', 'error');
+        return;
+    }
+    
+    showNotification('Uploading and analyzing resume...', 'info');
+    
+    fetch('/uploadResume', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(html => {
+        // Close modal first
+        const modal = bootstrap.Modal.getInstance(document.getElementById('uploadResumeModal'));
+        modal.hide();
+        
+        showNotification('Resume uploaded and analyzed successfully!', 'success');
+        setTimeout(() => location.reload(), 1500);
+    })
+    .catch(error => {
+        showNotification('Error uploading resume', 'error');
+    });
+}
+
+function filterDocuments() {
+    const filter = document.getElementById('categoryFilter').value;
+    const cards = document.querySelectorAll('.document-card');
+    
+    cards.forEach(card => {
+        if (!filter || card.dataset.category === filter) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function viewDocument(documentId) {
+    window.open(`/view_document/${documentId}`, '_blank');
+}
+
+function deleteDocument(documentId) {
+    if (confirm('Are you sure you want to delete this document?')) {
+        fetch(`/delete_document/${documentId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Document deleted successfully!', 'success');
+                location.reload();
+            } else {
+                showNotification(data.message || 'Failed to delete document', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error deleting document', 'error');
+        });
+    }
+}
+
+function deleteResume(resumeId) {
+    if (confirm('Are you sure you want to delete this resume?')) {
+        fetch(`/deleteResume/${resumeId}`, {
+            method: 'POST'
+        })
+        .then(response => {
+            if (response.ok) {
+                showNotification('Resume deleted successfully!', 'success');
+                location.reload();
+            } else {
+                showNotification('Failed to delete resume', 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error deleting resume', 'error');
+        });
+    }
+}
+
+function showNotification(message, type) {
+    const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+    const notification = `
+        <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+             style="top: 20px; right: 20px; z-index: 9999; max-width: 400px;" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('afterbegin', notification);
+    
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert) alert.remove();
+    }, 5000);
+}
+
+// Drag and drop functionality for quick upload
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadZone = document.querySelector('.upload-zone');
+    
+    if (uploadZone) {
+        uploadZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const input = document.getElementById('quickUploadInput');
+                input.files = files;
+                quickUploadDocuments(input);
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

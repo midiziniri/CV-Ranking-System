@@ -1,0 +1,743 @@
+{% extends "base.html" %}
+{% block body_class %}contact-page{% endblock %}
+{% block title %}Contact Us - Resume Ranking System{% endblock %}
+
+{% block styleInclude %}
+<style>
+  .contact-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 8rem 0 4rem;
+    color: white;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-hero::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,165.3C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+    background-size: cover;
+  }
+
+  .contact-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+
+  .contact-hero p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  /* Contact Section */
+  .contact-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .contact-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  /* Contact Info */
+  .contact-info {
+    position: sticky;
+    top: 100px;
+  }
+
+  .info-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 3rem;
+    color: white;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+  }
+
+  .info-card h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+  }
+
+  .info-card p {
+    font-size: 1.1rem;
+    margin-bottom: 2.5rem;
+    opacity: 0.95;
+    line-height: 1.8;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .info-item:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(5px);
+  }
+
+  .info-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: white;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .info-content h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-content p {
+    font-size: 1rem;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .info-content a {
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .info-content a:hover {
+    opacity: 0.8;
+    text-decoration: underline;
+  }
+
+  .social-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .social-link {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    background: white;
+    color: #667eea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .social-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
+  }
+
+  /* Contact Form */
+  .contact-form-container {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+  }
+
+  .contact-form-container h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .contact-form-container .subtitle {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+  .form-group .required {
+    color: #ef4444;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  }
+
+  textarea.form-control {
+    resize: vertical;
+    min-height: 150px;
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23667eea"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 24px;
+    padding-right: 3rem;
+  }
+
+  .char-count {
+    text-align: right;
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 3rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Success/Error Messages */
+  .alert {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideDown 0.3s ease-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+
+  .alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+  }
+
+  /* FAQ Section */
+  .faq-section {
+    background: linear-gradient(to bottom, #f8fafc, white);
+    padding: 6rem 0;
+  }
+
+  .faq-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .faq-title {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .faq-title h2 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .faq-title p {
+    font-size: 1.2rem;
+    color: #6b7280;
+  }
+
+  .faq-item {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .faq-item:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .faq-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    color: #6b7280;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .faq-item.active .faq-answer {
+    max-height: 500px;
+    margin-top: 1.5rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .contact-info {
+      position: static;
+    }
+
+    .info-card {
+      padding: 2rem;
+    }
+
+    .contact-form-container {
+      padding: 2rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contact-hero h1 {
+      font-size: 2.5rem;
+    }
+
+    .contact-hero p {
+      font-size: 1.1rem;
+      padding: 0 1rem;
+    }
+
+    .info-card h2 {
+      font-size: 2rem;
+    }
+
+    .faq-title h2 {
+      font-size: 2.5rem;
+    }
+
+    .faq-question {
+      font-size: 1.1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="contact-hero">
+  <div class="container">
+    <h1>Get In Touch</h1>
+    <p>Have questions? We're here to help. Reach out to our team and we'll respond as soon as possible.</p>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section class="contact-section">
+  <div class="container contact-container">
+    <div class="contact-grid">
+      <!-- Contact Information -->
+      <div class="contact-info">
+        <div class="info-card">
+          <h2>Contact Information</h2>
+          <p>Fill out the form and our team will get back to you within 24 hours.</p>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+              <h3>Email</h3>
+              <p><a href="mailto:support@hirearchy.com">support@hirearchy.com</a></p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-content">
+              <h3>Phone</h3>
+              <p><a href="tel:+1234567890">+1 (234) 567-890</a></p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="info-content">
+              <h3>Office</h3>
+              <p>123 Business Street<br>Suite 100<br>City, State 12345</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-content">
+              <h3>Business Hours</h3>
+              <p>Monday - Friday: 9:00 AM - 6:00 PM<br>Saturday - Sunday: Closed</p>
+            </div>
+          </div>
+
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook">
+              <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <i class="fab fa-instagram"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="contact-form-container">
+        <h2>Send us a Message</h2>
+        <p class="subtitle">We'd love to hear from you. Fill out the form below and we'll be in touch soon.</p>
+
+        <form id="contactForm" method="POST" action="/contact">
+          <!-- Success/Error Messages -->
+          <div id="formMessage"></div>
+
+          <div class="form-group">
+            <label for="name">Full Name <span class="required">*</span></label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="name" 
+              name="name" 
+              placeholder="John Doe" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email Address <span class="required">*</span></label>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email" 
+              name="email" 
+              placeholder="john@example.com" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input 
+              type="tel" 
+              class="form-control" 
+              id="phone" 
+              name="phone" 
+              placeholder="+1 (234) 567-890"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="subject">Subject <span class="required">*</span></label>
+            <select class="form-control form-select" id="subject" name="subject" required>
+              <option value="">Select a subject</option>
+              <option value="general">General Inquiry</option>
+              <option value="support">Technical Support</option>
+              <option value="billing">Billing Question</option>
+              <option value="feature">Feature Request</option>
+              <option value="partnership">Partnership Opportunity</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">Message <span class="required">*</span></label>
+            <textarea 
+              class="form-control" 
+              id="message" 
+              name="message" 
+              placeholder="Tell us more about your inquiry..." 
+              required
+              maxlength="1000"
+              oninput="updateCharCount()"
+            ></textarea>
+            <div class="char-count">
+              <span id="charCount">0</span> / 1000 characters
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-paper-plane"></i>
+            Send Message
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="faq-section">
+  <div class="container faq-container">
+    <div class="faq-title">
+      <h2>Frequently Asked Questions</h2>
+      <p>Quick answers to common questions about Hirearchy</p>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>How does Hirearchy's AI ranking system work?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        Our AI analyzes resumes and job descriptions using natural language processing and machine learning algorithms. It matches candidates based on skills, experience, education, and other relevant factors to provide accurate rankings that help you find the best fit quickly.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>Is Hirearchy free to use?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        Yes! Job seekers can create profiles and apply to jobs completely free. For employers, we offer both free and premium plans with advanced features like unlimited job postings, priority candidate ranking, and detailed analytics.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>How secure is my personal information?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        We take security very seriously. All data is encrypted using industry-standard protocols, and we're fully GDPR compliant. Your personal information is never shared with third parties without your explicit consent.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>Can I edit my profile after registration?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        Absolutely! You can update your profile, resume, skills, and preferences anytime from your dashboard. We recommend keeping your profile up-to-date to get the best job matches.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>How long does it take to get a response?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        For contact form submissions, our support team typically responds within 24 hours during business days. For job applications, response times vary by employer, but you'll receive notifications about your application status through our platform.
+      </div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+      <div class="faq-question">
+        <span>Do you offer customer support?</span>
+        <div class="faq-icon">
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+      <div class="faq-answer">
+        Yes! We offer email support for all users and priority support for premium members. You can reach us through the contact form above, via email at support@hirearchy.com, or through our in-app chat feature.
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Character count for message textarea
+  function updateCharCount() {
+    const message = document.getElementById('message');
+    const charCount = document.getElementById('charCount');
+    charCount.textContent = message.value.length;
+  }
+
+  // FAQ Toggle
+  function toggleFaq(element) {
+    const isActive = element.classList.contains('active');
+    
+    // Close all FAQ items
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    // Open clicked item if it wasn't active
+    if (!isActive) {
+      element.classList.add('active');
+    }
+  }
+
+  // Form submission handler
+  document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('.submit-btn');
+    const formMessage = document.getElementById('formMessage');
+    
+    // Disable submit button
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    // Get form data
+    const formData = new FormData(this);
+    
+    try {
+      // Simulate API call (replace with actual endpoint)
+      const response = await fetch('/contact', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        formMessage.innerHTML = `
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>Thank you! Your message has been sent successfully. We'll get back to you soon.</span>
+          </div>
+        `;
+        this.reset();
+        updateCharCount();
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      formMessage.innerHTML = `
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Oops! Something went wrong. Please try again or email us directly at support@hirearchy.com</span>
+        </div>
+      `;
+    } finally {
+      // Re-enable submit button
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+      
+      // Scroll to message
+      formMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+</script>
+{% endblock %}

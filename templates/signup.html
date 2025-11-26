@@ -1,0 +1,208 @@
+<!--signup.html-->
+{% extends "base.html" %} {% block body_class %}index-page{% endblock %}{% block title %}Resume Ranking System{% endblock %}
+{% block Addnav %}
+  
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">     
+ 
+
+ 
+ {% endblock %} {% block styleInclude %}
+
+<style>
+  @media screen and (min-width: 992px) {
+    a.sign_in {
+      width: 60%;
+    }
+  }
+  @media screen and (min-width: 1300px) {
+    a.sign_in {
+      width: 40%;
+    }
+  }
+  @media screen and (min-width: 300px) {
+    .main_card {
+      margin-top: 30px;
+    }
+  }
+
+</style>
+
+{% endblock %} {% block content %}
+<main>
+
+  
+  <div class="center-wrapper">
+
+<!--
+<main1 class="login-container1" role="main">
+  <h1 id="signupTitle" class="login-heading1">Sign Up</h1>
+
+  <form aria-label="Signup form" action="#" method="POST" onsubmit="return false;">
+    <div class="input-group1">
+      <label for="emailInput">Email:</label>
+      <input id="emailInput" class="input1" name="email" type="email" placeholder="" required/>
+        <path d="M4 4h16v16H4z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </div>
+
+    <div class="input-group1">
+      <label for="passwordInput">Password:</label>
+      <input id="passwordInput" class="input1" name="password" type="password" placeholder="" required/>
+      
+    </div>
+
+     <div class="input-group1">
+      <label for="passwordInput">Confirm Password:</label>
+      <input id="passwordInput" class="input1" name="password" type="password" placeholder="" required/>
+     </div>
+   
+  
+
+    <button type="submit" class="login-btn1" aria-label="Submit SignUp Form">Sign Up</button>
+  </form>
+
+  <div class="account-prompt1">
+    <b>Already have an account?</b>
+    <a href="#" class="sign-up-link1" tabindex="0">Sign Up</a>
+  </div>
+  
+-->
+
+
+<main1 class="login-container1" role="main">
+  <h1 id="signupTitle" class="login-heading1">Sign Up</h1>
+
+  <!-- Corrected form -->
+  <form aria-label="Signup form" action="/signup" method="POST">
+    <!-- Email Field -->
+    <div class="input-group1">
+      <label for="emailInput">Email:</label>
+      <input id="emailInput" class="input1" name="email" type="email" required />
+    </div>
+
+  
+    <!-- Username Field -->
+    <div class="input-group1">
+      <label for="usernameInput">Username:</label>
+      <input id="usernameInput" class="input1" name="username" type="text" required />
+    </div>
+
+
+
+
+
+    <!-- Password Field -->
+    <div class="input-group1">
+      <label for="passwordInput">Password:</label>
+      <input id="passwordInput" class="input1" name="password" type="password" required />
+    </div>
+
+    <!-- Confirm Password Field (optional, used only for client-side validation) -->
+    <!-- You can also validate this with JS -->
+    <div class="input-group1">
+      <label for="confirmPasswordInput">Confirm Password:</label>
+      <input id="confirmPasswordInput" class="input1" name="confirm_password" type="password" required />
+    </div>
+
+    <div class="input-group1">
+ 
+  <select name="role" id="roleSelect"  class="input1" required>
+    <option value="" disabled selected>Select your role</option>
+    <option value="applicant">Applicant</option>
+    <option value="employer">Employer</option>
+  </select>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="flash-message {{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+    <!-- Submit Button -->
+    <button type="submit" class="login-btn1" aria-label="Submit SignUp Form">Sign Up</button>
+    
+    
+
+  </form>
+
+
+
+
+
+  <div class="account-prompt1">
+    <b>Already have an account?</b>
+    <a href="/loginpage" class="sign-up-link1" tabindex="0">Login</a>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <div class="separator1" aria-label="Or separator">or</div>
+
+  <a
+          href="/login"
+          class="btn-getstarted"
+          style="z-index: 10"
+          ><i class="fab fa-google me-4"></i>Continue With Google
+          </a
+</main1>
+  </div>
+</main1>
+</main>
+  
+    <script src="http://localhost:35729/livereload.js?snipver=1"></script>
+
+<script>
+document.querySelectorAll('.input-group1 input').forEach(input => {
+  const label = input.previousElementSibling;
+
+  function toggleLabel() {
+    if (input.value.trim() !== '') {
+      label.style.display = 'none';
+    } else {
+      label.style.display = 'block';
+    }
+  }
+
+  input.addEventListener('input', toggleLabel);
+  input.addEventListener('blur', toggleLabel);
+  input.addEventListener('focus', toggleLabel);
+
+  // Initial state
+  toggleLabel();
+});
+</script>
+
+
+
+
+{% endblock %}

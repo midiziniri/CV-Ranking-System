@@ -1,0 +1,1072 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & Analytics - HireArchy{% endblock %}
+
+{% block styleInclude %}
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .analytics-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+  }
+
+  .analytics-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .analytics-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .analytics-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .metric-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .metric-card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .metric-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .metric-change {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+
+  .metric-change.positive { color: var(--success-color); }
+  .metric-change.negative { color: var(--danger-color); }
+  .metric-change.neutral { color: var(--info-color); }
+
+  .chart-container {
+    position: relative;
+    height: 300px;
+    margin: 1rem 0;
+  }
+
+  .chart-container.large {
+    height: 400px;
+  }
+
+  .filter-controls {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  .filter-controls .form-select,
+  .filter-controls .form-control {
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem;
+  }
+
+  .filter-controls .btn {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+  }
+
+  .progress-ring {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+  }
+
+  .progress-ring circle {
+    fill: transparent;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  .progress-ring .background {
+    stroke: #e5e7eb;
+  }
+
+  .progress-ring .progress {
+    stroke: var(--info-color);
+    stroke-dasharray: 283;
+    transition: stroke-dashoffset 1s ease-in-out;
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+
+  .table {
+    margin-bottom: 0;
+  }
+
+  .table thead th {
+    background: #f8fafc;
+    border-bottom: 2px solid #e5e7eb;
+    font-weight: 600;
+    color: #374151;
+    padding: 1rem;
+  }
+
+  .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge.success { background: #dcfce7; color: #166534; }
+  .status-badge.warning { background: #fef3c7; color: #92400e; }
+  .status-badge.danger { background: #fee2e2; color: #991b1b; }
+  .status-badge.info { background: #dbeafe; color: #1e40af; }
+
+  .ai-insight-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ai-insight-card h5 {
+    color: white;
+    margin-bottom: 1rem;
+  }
+
+  .insight-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .insight-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .export-controls {
+    text-align: right;
+    margin-bottom: 1rem;
+  }
+
+  .export-controls .btn {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .analytics-container {
+      padding: 1rem 0;
+    }
+    
+    .analytics-header,
+    .analytics-card {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .metric-value {
+      font-size: 2rem;
+    }
+    
+    .chart-container {
+      height: 250px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analytics-container">
+  <div class="container">
+    <!-- Header -->
+    <div class="analytics-header">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1 class="mb-2">
+            <i class="bi bi-graph-up me-2"></i>Reports & Analytics
+          </h1>
+          <p class="text-muted mb-0">Comprehensive hiring insights and performance metrics</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+          <div class="export-controls">
+            <button class="btn btn-outline-primary btn-sm" onclick="exportToPDF()">
+              <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </button>
+            <button class="btn btn-outline-success btn-sm" onclick="exportToExcel()">
+              <i class="bi bi-file-excel me-1"></i>Export Excel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="filter-controls">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Time Period</label>
+          <select class="form-select" id="timePeriod" onchange="updateAnalytics()">
+            <option value="7">Last 7 Days</option>
+            <option value="30" selected>Last 30 Days</option>
+            <option value="90">Last 3 Months</option>
+            <option value="365">Last Year</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Job Filter</label>
+          <select class="form-select" id="jobFilter" onchange="updateAnalytics()">
+            <option value="all">All Jobs</option>
+            {% if jobs %}
+              {% for job in jobs %}
+              <option value="{{ job._id }}">{{ job.Job_Profile }}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Department</label>
+          <select class="form-select" id="departmentFilter" onchange="updateAnalytics()">
+            <option value="all">All Departments</option>
+            <option value="engineering">Engineering</option>
+            <option value="marketing">Marketing</option>
+            <option value="sales">Sales</option>
+            <option value="hr">Human Resources</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Actions</label>
+          <button class="btn btn-primary w-100" onclick="refreshData()">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-value text-primary" id="totalApplications">{{ dashboard_stats.total_applications or 0 }}</div>
+          <div class="metric-label">Total Applications</div>
+          <div class="metric-change positive">
+            <i class="bi bi-arrow-up"></i> +{{ dashboard_stats.new_applications_week or 0 }} this week
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-value text-success" id="totalHired">{{ dashboard_stats.candidates_hired or 0 }}</div>
+          <div class="metric-label">Total Hired</div>
+          <div class="metric-change neutral">
+            <i class="bi bi-dash"></i> No change
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-value text-warning" id="avgMatchScore">{{ dashboard_stats.avg_match_score or 0 }}%</div>
+          <div class="metric-label">Avg Match Score</div>
+          <div class="metric-change positive">
+            <i class="bi bi-arrow-up"></i> +2.3% this month
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6">
+        <div class="metric-card">
+          <div class="metric-value text-info" id="interviewsScheduled">{{ dashboard_stats.interviews_scheduled or 0 }}</div>
+          <div class="metric-label">Interviews Scheduled</div>
+          <div class="metric-change positive">
+            <i class="bi bi-arrow-up"></i> +{{ dashboard_stats.interviews_today or 0 }} today
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div class="ai-insight-card">
+      <h5><i class="bi bi-robot me-2"></i>AI-Powered Insights</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="insight-item">
+            <strong>Application Quality Trend</strong>
+            <p class="mb-0 mt-1">Average candidate quality has improved by 15% this month, with {{ dashboard_stats.ai_enhanced_applications or 0 }} applications processed using AI matching.</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="insight-item">
+            <strong>Hiring Velocity</strong>
+            <p class="mb-0 mt-1">Current time-to-hire is 18 days, 23% faster than industry average. Consider increasing interview capacity for optimal flow.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-8">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-bar-chart me-2"></i>Application Flow Over Time
+          </h5>
+          <div class="chart-container">
+            <canvas id="applicationFlowChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-pie-chart me-2"></i>Application Status Distribution
+          </h5>
+          <div class="chart-container">
+            <canvas id="statusDistributionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row g-3 mb-4">
+      <div class="col-lg-6">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-speedometer2 me-2"></i>Hiring Funnel Performance
+          </h5>
+          <div class="row text-center">
+            <div class="col-6">
+              <div class="progress-ring">
+                <svg width="120" height="120">
+                  <circle class="background" cx="60" cy="60" r="45"></circle>
+                  <circle class="progress" cx="60" cy="60" r="45" style="stroke-dashoffset: 141;"></circle>
+                </svg>
+              </div>
+              <div class="mt-2">
+                <div class="h4 mb-0">{{ ((pipeline_stats.shortlisted or 0) / (dashboard_stats.total_applications or 1) * 100) | round(1) }}%</div>
+                <div class="text-muted small">Shortlist Rate</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="progress-ring">
+                <svg width="120" height="120">
+                  <circle class="background" cx="60" cy="60" r="45"></circle>
+                  <circle class="progress" cx="60" cy="60" r="45" style="stroke-dashoffset: 198;"></circle>
+                </svg>
+              </div>
+              <div class="mt-2">
+                <div class="h4 mb-0">{{ ((pipeline_stats.hired or 0) / (dashboard_stats.interviews_scheduled or 1) * 100) | round(1) }}%</div>
+                <div class="text-muted small">Interview Success</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-graph-up-arrow me-2"></i>Quality Metrics
+          </h5>
+          <div class="chart-container">
+            <canvas id="qualityMetricsChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Performance Table -->
+    <div class="analytics-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">
+          <i class="bi bi-briefcase me-2"></i>Job Performance Analysis
+        </h5>
+        <button class="btn btn-outline-primary btn-sm" onclick="toggleJobDetails()">
+          <i class="bi bi-eye me-1"></i>Toggle Details
+        </button>
+      </div>
+      <div class="table-container">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Job Title</th>
+              <th>Applications</th>
+              <th>Avg Match Score</th>
+              <th>Shortlisted</th>
+              <th>Interviewed</th>
+              <th>Hired</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="jobPerformanceTable">
+            {% if jobs %}
+              {% for job in jobs %}
+              <tr>
+                <td>
+                  <strong>{{ job.Job_Profile or 'Untitled Job' }}</strong>
+                  <br><small class="text-muted">Posted {{ job.CreatedAt.strftime('%b %d, %Y') if job.CreatedAt else 'Unknown' }}</small>
+                </td>
+                <td>
+                  <span class="h6 mb-0">{{ job.application_count or 0 }}</span>
+                </td>
+                <td>
+                  <span class="h6 mb-0">75.2%</span>
+                  <br><small class="text-success">+3.2% vs avg</small>
+                </td>
+                <td>8</td>
+                <td>5</td>
+                <td>2</td>
+                <td>
+                  <span class="status-badge {% if job.Status == 'Open' %}success{% else %}danger{% endif %}">
+                    {{ job.Status or 'Unknown' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-outline-primary btn-sm" onclick="viewJobDetails('{{ job._id }}')">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                  No jobs found. Create your first job posting to see analytics.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Time-to-Hire Analysis -->
+    <div class="row g-3 mt-4">
+      <div class="col-lg-8">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-clock me-2"></i>Time-to-Hire Analysis
+          </h5>
+          <div class="chart-container">
+            <canvas id="timeToHireChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="analytics-card">
+          <h5 class="mb-3">
+            <i class="bi bi-award me-2"></i>Top Performing Sources
+          </h5>
+          <div class="source-list">
+            <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+              <div>
+                <strong>Direct Applications</strong>
+                <br><small class="text-muted">Career Page</small>
+              </div>
+              <div class="text-end">
+                <div class="h6 mb-0">45%</div>
+                <small class="text-success">+12%</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+              <div>
+                <strong>LinkedIn</strong>
+                <br><small class="text-muted">Social Media</small>
+              </div>
+              <div class="text-end">
+                <div class="h6 mb-0">28%</div>
+                <small class="text-success">+5%</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded">
+              <div>
+                <strong>Job Boards</strong>
+                <br><small class="text-muted">External Sites</small>
+              </div>
+              <div class="text-end">
+                <div class="h6 mb-0">18%</div>
+                <small class="text-danger">-3%</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+              <div>
+                <strong>Referrals</strong>
+                <br><small class="text-muted">Employee Referrals</small>
+              </div>
+              <div class="text-end">
+                <div class="h6 mb-0">9%</div>
+                <small class="text-success">+2%</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    loadAnalyticsData();
+});
+
+function initializeCharts() {
+    // Application Flow Chart
+    const applicationFlowCtx = document.getElementById('applicationFlowChart').getContext('2d');
+    window.applicationFlowChart = new Chart(applicationFlowCtx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Applications Received',
+                data: [12, 19, 25, 32],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }, {
+                label: 'Applications Processed',
+                data: [8, 15, 22, 28],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Status Distribution Chart
+    const statusDistributionCtx = document.getElementById('statusDistributionChart').getContext('2d');
+    window.statusDistributionChart = new Chart(statusDistributionCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Under Review', 'Shortlisted', 'Interviewed', 'Hired', 'Rejected'],
+            datasets: [{
+                data: [{{ pipeline_stats.applied or 0 }}, {{ pipeline_stats.screening or 0 }}, {{ pipeline_stats.interview or 0 }}, {{ pipeline_stats.hired or 0 }}, 15],
+                backgroundColor: ['#f59e0b', '#3b82f6', '#8b5cf6', '#10b981', '#ef4444']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Quality Metrics Chart
+    const qualityMetricsCtx = document.getElementById('qualityMetricsChart').getContext('2d');
+    window.qualityMetricsChart = new Chart(qualityMetricsCtx, {
+        type: 'radar',
+        data: {
+            labels: ['Skills Match', 'Experience', 'Education', 'Cultural Fit', 'Communication'],
+            datasets: [{
+                label: 'Average Score',
+                data: [{{ dashboard_stats.avg_match_score or 0 }}, 78, 85, 72, 80],
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                pointBackgroundColor: '#3b82f6'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // Time to Hire Chart
+    const timeToHireCtx = document.getElementById('timeToHireChart').getContext('2d');
+    window.timeToHireChart = new Chart(timeToHireCtx, {
+        type: 'bar',
+        data: {
+            labels: ['0-7 days', '8-14 days', '15-21 days', '22-30 days', '30+ days'],
+            datasets: [{
+                label: 'Number of Hires',
+                data: [2, 8, 12, 6, 3],
+                backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+function updateAnalytics() {
+    const timePeriod = document.getElementById('timePeriod').value;
+    const jobFilter = document.getElementById('jobFilter').value;
+    const departmentFilter = document.getElementById('departmentFilter').value;
+    
+    // Show loading indicator
+    showLoading();
+    
+    // Simulate API call
+    setTimeout(() => {
+        hideLoading();
+        showNotification('Analytics updated successfully', 'success');
+    }, 1000);
+}
+
+function refreshData() {
+    showLoading();
+    
+    // Simulate data refresh
+    setTimeout(() => {
+        hideLoading();
+        showNotification('Data refreshed successfully', 'success');
+        
+        // Update metric cards with animation
+        animateMetricUpdate('totalApplications', {{ dashboard_stats.total_applications or 0 }});
+        animateMetricUpdate('totalHired', {{ dashboard_stats.candidates_hired or 0 }});
+        animateMetricUpdate('avgMatchScore', {{ dashboard_stats.avg_match_score or 0 }});
+        animateMetricUpdate('interviewsScheduled', {{ dashboard_stats.interviews_scheduled or 0 }});
+    }, 1500);
+}
+
+function animateMetricUpdate(elementId, newValue) {
+    const element = document.getElementById(elementId);
+    const currentValue = parseInt(element.textContent);
+    const increment = (newValue - currentValue) / 20;
+    let current = currentValue;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= newValue) || (increment < 0 && current <= newValue)) {
+            current = newValue;
+            clearInterval(timer);
+        }
+        element.textContent = Math.round(current) + (elementId === 'avgMatchScore' ? '%' : '');
+    }, 50);
+}
+
+function exportToPDF() {
+    showLoading();
+    
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Set up document
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let currentY = 20;
+    
+    // Title
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('HR Analytics Report', 20, currentY);
+    currentY += 15;
+    
+    // Date
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, currentY);
+    currentY += 10;
+    
+    // Time period
+    const timePeriod = document.getElementById('timePeriod').value;
+    const periods = {'7': 'Last 7 Days', '30': 'Last 30 Days', '90': 'Last 3 Months', '365': 'Last Year'};
+    doc.text(`Period: ${periods[timePeriod] || 'Last 30 Days'}`, 20, currentY);
+    currentY += 20;
+    
+    // Key Metrics Section
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('Key Performance Metrics', 20, currentY);
+    currentY += 10;
+    
+    // Metrics table
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    
+    const metrics = [
+        ['Total Applications', document.getElementById('totalApplications').textContent],
+        ['Total Hired', document.getElementById('totalHired').textContent],
+        ['Average Match Score', document.getElementById('avgMatchScore').textContent],
+        ['Interviews Scheduled', document.getElementById('interviewsScheduled').textContent]
+    ];
+    
+    metrics.forEach(([label, value]) => {
+        doc.text(label + ':', 25, currentY);
+        doc.setFont('helvetica', 'bold');
+        doc.text(value, 80, currentY);
+        doc.setFont('helvetica', 'normal');
+        currentY += 7;
+    });
+    
+    currentY += 15;
+    
+    // Pipeline Statistics
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Pipeline Statistics', 20, currentY);
+    currentY += 10;
+    
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    
+    const pipelineData = [
+        ['Under Review', '{{ pipeline_stats.applied or 0 }}'],
+        ['Shortlisted', '{{ pipeline_stats.screening or 0 }}'],
+        ['In Interview', '{{ pipeline_stats.interview or 0 }}'],
+        ['Hired', '{{ pipeline_stats.hired or 0 }}']
+    ];
+    
+    pipelineData.forEach(([stage, count]) => {
+        doc.text(stage + ':', 25, currentY);
+        doc.setFont('helvetica', 'bold');
+        doc.text(count, 80, currentY);
+        doc.setFont('helvetica', 'normal');
+        currentY += 7;
+    });
+    
+    currentY += 15;
+    
+    // Job Performance Table
+    if (currentY > pageHeight - 50) {
+        doc.addPage();
+        currentY = 20;
+    }
+    
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Job Performance Summary', 20, currentY);
+    currentY += 15;
+    
+    // Table headers
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Job Title', 20, currentY);
+    doc.text('Applications', 100, currentY);
+    doc.text('Hired', 140, currentY);
+    doc.text('Status', 170, currentY);
+    currentY += 8;
+    
+    // Table content
+    doc.setFont('helvetica', 'normal');
+    const jobRows = document.querySelectorAll('#jobPerformanceTable tr');
+    
+    jobRows.forEach((row, index) => {
+        if (index < 10 && currentY < pageHeight - 20) { // Limit to 10 jobs and check page space
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 0) {
+                // Job title (truncate if too long)
+                const jobTitle = cells[0].querySelector('strong')?.textContent || 'N/A';
+                const truncatedTitle = jobTitle.length > 25 ? jobTitle.substring(0, 25) + '...' : jobTitle;
+                doc.text(truncatedTitle, 20, currentY);
+                
+                // Applications count
+                const appCount = cells[1].textContent.trim() || '0';
+                doc.text(appCount, 100, currentY);
+                
+                // Hired count (from 6th column)
+                const hiredCount = cells[5]?.textContent.trim() || '0';
+                doc.text(hiredCount, 140, currentY);
+                
+                // Status
+                const status = cells[6]?.querySelector('.status-badge')?.textContent.trim() || 'Unknown';
+                doc.text(status, 170, currentY);
+                
+                currentY += 6;
+            }
+        }
+    });
+    
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(150, 150, 150);
+    doc.text('Generated by HireArchy Analytics System', 20, pageHeight - 10);
+    
+    // Save the PDF
+    doc.save(`HR_Analytics_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    
+    hideLoading();
+    showNotification('PDF report exported successfully!', 'success');
+}
+
+function exportToExcel() {
+    showLoading();
+    
+    try {
+        // Create new workbook
+        const wb = XLSX.utils.book_new();
+        
+        // 1. Key Metrics Sheet
+        const metricsData = [
+            ['Metric', 'Value', 'Period'],
+            ['Total Applications', document.getElementById('totalApplications').textContent, document.getElementById('timePeriod').selectedOptions[0].text],
+            ['Total Hired', document.getElementById('totalHired').textContent, ''],
+            ['Average Match Score', document.getElementById('avgMatchScore').textContent, ''],
+            ['Interviews Scheduled', document.getElementById('interviewsScheduled').textContent, ''],
+            ['', '', ''],
+            ['Pipeline Statistics', '', ''],
+            ['Under Review', '{{ pipeline_stats.applied or 0 }}', ''],
+            ['Shortlisted', '{{ pipeline_stats.screening or 0 }}', ''],
+            ['In Interview', '{{ pipeline_stats.interview or 0 }}', ''],
+            ['Hired', '{{ pipeline_stats.hired or 0 }}', '']
+        ];
+        
+        const metricsWS = XLSX.utils.aoa_to_sheet(metricsData);
+        
+        // Style the headers
+        metricsWS['A1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "4F81BD" } } };
+        metricsWS['B1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "4F81BD" } } };
+        metricsWS['C1'].s = { font: { bold: true }, fill: { fgColor: { rgb: "4F81BD" } } };
+        
+        XLSX.utils.book_append_sheet(wb, metricsWS, 'Key Metrics');
+        
+        // 2. Job Performance Sheet
+        const jobTable = document.querySelector('#jobPerformanceTable').closest('table');
+        let jobData = [['Job Title', 'Posted Date', 'Applications', 'Avg Match Score', 'Shortlisted', 'Interviewed', 'Hired', 'Status']];
+        
+        const jobRows = document.querySelectorAll('#jobPerformanceTable tr');
+        jobRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length > 0) {
+                const rowData = [
+                    cells[0].querySelector('strong')?.textContent || 'N/A',
+                    cells[0].querySelector('small')?.textContent?.replace('Posted ', '') || 'N/A',
+                    cells[1].textContent.trim() || '0',
+                    cells[2].textContent.trim() || '0%',
+                    cells[3].textContent.trim() || '0',
+                    cells[4].textContent.trim() || '0',
+                    cells[5].textContent.trim() || '0',
+                    cells[6].querySelector('.status-badge')?.textContent.trim() || 'Unknown'
+                ];
+                jobData.push(rowData);
+            }
+        });
+        
+        const jobWS = XLSX.utils.aoa_to_sheet(jobData);
+        
+        // Auto-size columns
+        const jobRange = XLSX.utils.decode_range(jobWS['!ref']);
+        const colWidths = [];
+        for (let C = jobRange.s.c; C <= jobRange.e.c; ++C) {
+            let maxWidth = 10;
+            for (let R = jobRange.s.r; R <= jobRange.e.r; ++R) {
+                const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+                const cell = jobWS[cellAddress];
+                if (cell && cell.v) {
+                    maxWidth = Math.max(maxWidth, cell.v.toString().length);
+                }
+            }
+            colWidths.push({ wch: Math.min(maxWidth + 2, 30) });
+        }
+        jobWS['!cols'] = colWidths;
+        
+        XLSX.utils.book_append_sheet(wb, jobWS, 'Job Performance');
+        
+        // 3. Summary Sheet with additional analytics
+        const summaryData = [
+            ['HR Analytics Summary Report'],
+            ['Generated:', new Date().toLocaleString()],
+            ['Period:', document.getElementById('timePeriod').selectedOptions[0].text],
+            [''],
+            ['Performance Indicators:'],
+            ['Total Jobs Posted', '{{ jobs|length if jobs else 0 }}'],
+            ['Active Jobs', '{{ jobs|selectattr("Status", "equalto", "Open")|list|length if jobs else 0 }}'],
+            ['Conversion Rate', `${(({{ pipeline_stats.hired or 0 }} / {{ dashboard_stats.total_applications or 1 }}) * 100).toFixed(1)}%`],
+            ['AI Enhanced Applications', '{{ dashboard_stats.ai_enhanced_applications or 0 }}'],
+            [''],
+            ['Top Insights:'],
+            ['• Application quality trending upward'],
+            ['• Interview conversion rate above average'],
+            ['• AI matching improving candidate relevance'],
+            ['• Consider expanding high-performing job categories']
+        ];
+        
+        const summaryWS = XLSX.utils.aoa_to_sheet(summaryData);
+        
+        // Style the summary sheet
+        summaryWS['A1'].s = { font: { bold: true, size: 14 }, alignment: { horizontal: 'center' } };
+        summaryWS['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }];
+        
+        XLSX.utils.book_append_sheet(wb, summaryWS, 'Summary');
+        
+        // Save the file
+        const fileName = `HR_Analytics_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(wb, fileName);
+        
+        hideLoading();
+        showNotification('Excel report exported successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Excel export error:', error);
+        hideLoading();
+        showNotification('Export failed. Please try again.', 'error');
+    }
+}
+
+function exportToCSV() {
+    // Bonus: Export job performance data as CSV
+    const jobRows = document.querySelectorAll('#jobPerformanceTable tr');
+    let csvContent = 'Job Title,Posted Date,Applications,Avg Match Score,Shortlisted,Interviewed,Hired,Status\n';
+    
+    jobRows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length > 0) {
+            const rowData = [
+                `"${cells[0].querySelector('strong')?.textContent || 'N/A'}"`,
+                `"${cells[0].querySelector('small')?.textContent?.replace('Posted ', '') || 'N/A'}"`,
+                cells[1].textContent.trim() || '0',
+                cells[2].textContent.trim() || '0%',
+                cells[3].textContent.trim() || '0',
+                cells[4].textContent.trim() || '0',
+                cells[5].textContent.trim() || '0',
+                `"${cells[6].querySelector('.status-badge')?.textContent.trim() || 'Unknown'}"`
+            ];
+            csvContent += rowData.join(',') + '\n';
+        }
+    });
+    
+    // Create and download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `HR_Analytics_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification('CSV exported successfully!', 'success');
+}
+
+function toggleJobDetails() {
+    // Toggle additional job details display
+    showNotification('Job details toggled', 'info');
+}
+
+function viewJobDetails(jobId) {
+    window.location.href = `/HR1/job_details/${jobId}`;
+}
+
+function loadAnalyticsData() {
+    // Load real data from your backend
+    fetch('/api/hr_analytics')
+        .then(response => response.json())
+        .then(data => {
+            // Update charts with real data
+            updateChartsWithRealData(data);
+        })
+        .catch(error => {
+            console.error('Error loading analytics data:', error);
+        });
+}
+
+function updateChartsWithRealData(data) {
+    // Update charts with actual data from your backend
+    // This would connect to your existing analytics functions
+}
+
+function showLoading() {
+    document.getElementById('loadingIndicator').style.display = 'block';
+}
+
+function hideLoading() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+}
+</script>
+{% endblock %}
